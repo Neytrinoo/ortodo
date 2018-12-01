@@ -234,7 +234,7 @@ border-top-color: rgb(170, 85, 127);</string>
       </size>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_2">
+    <widget class="QPushButton" name="switch_buy">
      <property name="geometry">
       <rect>
        <x>-1</x>
@@ -273,7 +273,7 @@ border-top-color: rgb(170, 85, 127);</string>
       </size>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton">
+    <widget class="QPushButton" name="switch_to_do">
      <property name="geometry">
       <rect>
        <x>0</x>
@@ -855,6 +855,33 @@ border-color: rgb(255, 170, 255);
       <size>
        <width>40</width>
        <height>40</height>
+      </size>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="delete_2">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>290</y>
+       <width>31</width>
+       <height>38</height>
+      </rect>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normalon>Дизайн/icons/Удалить.png</normalon>
+      </iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>31</width>
+       <height>38</height>
       </size>
      </property>
     </widget>
