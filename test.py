@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QWidget, QApplication, QPushButton
+from PyQt5.QtWidgets import QWidget, QApplication, QPushButton, QSpinBox
 from PyQt5.QtWidgets import QInputDialog
 
 
@@ -12,23 +12,19 @@ class Example(QWidget):
         self.setGeometry(300, 300, 150, 150)
         self.setWindowTitle('Диалоговые окна')
 
-        self.button_1 = QPushButton(self)
-        self.button_1.move(20, 40)
-        self.button_1.setText("Кнопка")
-        self.button_1.clicked.connect(self.run)
+        self.s = QSpinBox(self)
+        self.s.resize(50, 50)
+        self.s.move(100, 100)
+        self.b = QPushButton('Показать', self)
+        self.b.resize(self.b.sizeHint())
+        self.b.move(50, 50)
+        self.b.clicked.connect(self.run)
+        print(self.s.text())
 
         self.show()
 
     def run(self):
-        i, okBtnPressed = QInputDialog.getItem(
-            self,
-            "Выберите вашу страну",
-            "Удалить?",
-            ("Да", "Нет"),
-            1,
-            False
-        )
-        print(i, okBtnPressed)
+        print(self.s.text())
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
