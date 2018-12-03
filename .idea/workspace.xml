@@ -4,10 +4,8 @@
     <list default="true" id="415a2798-d266-40d4-84d2-057ba5673ad4" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/design.ui" beforeDir="false" afterPath="$PROJECT_DIR$/design.ui" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/to_do.json" beforeDir="false" afterPath="$PROJECT_DIR$/to_do.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/todo.py" beforeDir="false" afterPath="$PROJECT_DIR$/todo.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Дизайн/Иконки.psd" beforeDir="false" afterPath="$PROJECT_DIR$/Дизайн/Иконки.psd" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -19,53 +17,56 @@
     <session id="1427729963">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="17" />
-          <entry key="project.open.time.0" value="7" />
-          <entry key="project.open.time.2" value="5" />
+          <entry key="project.closed" value="19" />
+          <entry key="project.open.time.0" value="8" />
+          <entry key="project.open.time.2" value="6" />
           <entry key="project.open.time.3" value="5" />
-          <entry key="project.opened" value="17" />
+          <entry key="project.opened" value="19" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="py" value="9" />
+          <entry key="py" value="11" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Python" value="9" />
+          <entry key="Python" value="11" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="10107" />
+          <entry key="py" value="12348" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="10107" />
+          <entry key="Python" value="12348" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/todo.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="250">
-              <caret line="294" column="34" lean-forward="true" selection-start-line="294" selection-start-column="34" selection-end-line="294" selection-end-column="34" />
+            <state relative-caret-position="161">
+              <caret line="483" column="18" lean-forward="true" selection-start-line="483" selection-start-column="18" selection-end-line="483" selection-end-column="18" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
+                <marker date="1543851901154" expanded="true" signature="11646:13963" ph="..." />
+                <marker date="1543851901154" expanded="true" signature="13999:15153" ph="..." />
+                <marker date="1543851901154" expanded="true" signature="23403:24068" ph="..." />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="408">
+            <state relative-caret-position="442">
               <caret line="26" column="26" selection-start-line="26" selection-start-column="26" selection-end-line="26" selection-end-column="26" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
@@ -95,7 +96,7 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1838" />
+    <option name="x" value="1912" />
     <option name="y" value="-8" />
     <option name="width" value="1936" />
     <option name="height" value="1056" />
@@ -138,7 +139,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="G:/копия проекта" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunDashboard">
@@ -175,6 +176,27 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="todo (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="Проект PyQt" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="G:/копия проекта" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="G:/копия проекта/todo.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="todo" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Проект PyQt" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -199,10 +221,12 @@
     <list>
       <item itemvalue="Python.todo" />
       <item itemvalue="Python.test" />
+      <item itemvalue="Python.todo (1)" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.todo" />
+        <item itemvalue="Python.todo (1)" />
         <item itemvalue="Python.test" />
       </list>
     </recent_temporary>
@@ -222,6 +246,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="1912" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25131717" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -281,19 +306,39 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/todo.py">
+    <entry file="file://G:/копия проекта/todo.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="250">
-          <caret line="294" column="34" lean-forward="true" selection-start-line="294" selection-start-column="34" selection-end-line="294" selection-end-column="34" />
+        <state relative-caret-position="272">
+          <caret line="16" column="47" selection-start-line="16" selection-start-column="47" selection-end-line="16" selection-end-column="47" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://C:/ProgramData/Anaconda3/Lib/site-packages/django/conf/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="544">
+          <caret line="41" selection-start-line="41" selection-end-line="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/todo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="161">
+          <caret line="483" column="18" lean-forward="true" selection-start-line="483" selection-start-column="18" selection-end-line="483" selection-end-column="18" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+            <marker date="1543851901154" expanded="true" signature="11646:13963" ph="..." />
+            <marker date="1543851901154" expanded="true" signature="13999:15153" ph="..." />
+            <marker date="1543851901154" expanded="true" signature="23403:24068" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
+        <state relative-caret-position="442">
           <caret line="26" column="26" selection-start-line="26" selection-start-column="26" selection-end-line="26" selection-end-column="26" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
