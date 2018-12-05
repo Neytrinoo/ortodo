@@ -2127,7 +2127,7 @@ border-color: rgb(255, 170, 255);
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -2148,7 +2148,7 @@ border-color: rgb(255, 170, 255);
       <attribute name="title">
        <string>Выполненные дела</string>
       </attribute>
-      <widget class="PlotWidget" name="graphicsView_2">
+      <widget class="PlotWidget" name="graphicsView">
        <property name="geometry">
         <rect>
          <x>100</x>

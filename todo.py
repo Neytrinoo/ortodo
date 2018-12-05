@@ -488,13 +488,37 @@ class MyWidget(QMainWindow):
         self.switch_progress.setIcon(QIcon(self.PATH_TO_ACTIVE_PROGRESS_ICON))
         self.clear_buy()
         self.clear_to_dos()
+        # Вывод потраченных сумм по дням
         self.already_buys = json.loads(open(self.PATH_ALL_BUYS_JSON).read())
-        print(self.already_buys)
-        sort_for_date = sorted(self.already_buys['all_buys'], key=lambda x: (x['date'].split('.')[2], x['date'].split('.')[1], x['date'].split('.')[0]))
-        prices = [int(price['price']) for price in sort_for_date]
+        sort_for_date = sorted(self.already_buys['all_buys'], key=lambda x: (
+            x['date'].split('.')[2], x['date'].split('.')[1], x['date'].split('.')[0]))
+        print(sort_for_date)
+        prices = {}
+        for elem in sort_for_date:
+            if elem['date'] in prices:
+                prices[elem['date']] += int(elem['price'])
+            else:
+                prices[elem['date']] = int(elem['price'])
+        prices = [j for i, j in prices.items()]
         print(prices)
         self.graphicsBuys.plot([i for i in range(len(prices))],
                                [price for price in prices], pen='r')
+
+        # Вывод количества сделанных дел по дням
+        self.already_done = json.loads(open(self.PATH_ALL_TODOS_JSON).read())
+        sort_for_date = sorted(self.already_done['all_to_dos'], key=lambda x: (
+            x['date'].split('.')[2], x['date'].split('.')[1], x['date'].split('.')[0]))
+        dones = {}
+        print(sort_for_date)
+        for elem in sort_for_date:
+            if elem['date'] in dones:
+                dones[elem['date']] += 1
+            else:
+                dones[elem['date']] = 1
+        dones = [j for i, j in dones.items()]
+        print(dones)
+        self.graphicsView.plot([i for i in range(len(dones))],
+                               [count for count in dones], pen='r')
 
     def add_todo_f(self):
         # Проверка правильности ввода
