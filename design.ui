@@ -276,7 +276,7 @@ border-top-color: rgb(170, 85, 127);</string>
     <widget class="QPushButton" name="switch_to_do">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>-1</x>
        <y>90</y>
        <width>290</width>
        <height>70</height>
@@ -299,10 +299,10 @@ border-top-color: rgb(170, 85, 127);</string>
       </size>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_3">
+    <widget class="QPushButton" name="switch_notes">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>-1</x>
        <y>270</y>
        <width>291</width>
        <height>70</height>
@@ -326,11 +326,71 @@ border-top-color: rgb(170, 85, 127);</string>
       </size>
      </property>
     </widget>
+    <widget class="QPushButton" name="switch_all_tasks">
+     <property name="geometry">
+      <rect>
+       <x>-1</x>
+       <y>460</y>
+       <width>291</width>
+       <height>70</height>
+      </rect>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normalon>Дизайн/icons/Все дела неактивное.png</normalon>
+      </iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>290</width>
+       <height>70</height>
+      </size>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="switch_all_buys">
+     <property name="geometry">
+      <rect>
+       <x>-1</x>
+       <y>550</y>
+       <width>291</width>
+       <height>70</height>
+      </rect>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normalon>Дизайн/icons/все покупки неактивные.png</normalon>
+      </iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>290</width>
+       <height>70</height>
+      </size>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
-      <x>277</x>
+      <x>276</x>
       <y>0</y>
       <width>0</width>
       <height>0</height>
@@ -2101,7 +2161,7 @@ border-color: rgb(255, 170, 255);
      <rect>
       <x>280</x>
       <y>-10</y>
-      <width>1670</width>
+      <width>0</width>
       <height>1071</height>
      </rect>
     </property>
@@ -2127,7 +2187,7 @@ border-color: rgb(255, 170, 255);
       </rect>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -2159,6 +2219,29 @@ border-color: rgb(255, 170, 255);
        </property>
       </widget>
      </widget>
+    </widget>
+   </widget>
+   <widget class="QScrollArea" name="all_tasks_scroll">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>0</y>
+      <width>1671</width>
+      <height>1071</height>
+     </rect>
+    </property>
+    <property name="widgetResizable">
+     <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="scrollAreaWidgetContents_4">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>1669</width>
+       <height>1069</height>
+      </rect>
+     </property>
     </widget>
    </widget>
   </widget>

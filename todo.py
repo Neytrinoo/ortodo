@@ -1,6 +1,7 @@
 import sys
-from PyQt5 import uic
-from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton, QLineEdit, QLabel, QGroupBox, QInputDialog
+from PyQt5 import uic, QtCore
+from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton, QLineEdit, QLabel, QGroupBox, QInputDialog, \
+    QVBoxLayout
 from PyQt5.QtGui import QPixmap, QIcon
 import json
 import os
@@ -41,12 +42,15 @@ class MyWidget(QMainWindow):
         self.PATH_TO_TODO_ACTIVE_ICON = 'Дизайн/icons/Список дел.png'
         self.PATH_TO_NOACTIVE_PROGRESS_ICON = 'Дизайн/icons/Прогресс.png'
         self.PATH_TO_ACTIVE_PROGRESS_ICON = 'Дизайн/icons/Прогресс активный.png'
+        self.PATH_TO_NOACTIVE_ALL_TASKS_ICON = 'Дизайн/icons/Все дела неактивное.png'
+        self.PATH_TO_ACTIVE_ALL_TASKS_ICON = 'Дизайн/icons/Все дела активное.png'
 
         self.arr_buys = []
         self.add_todo.clicked.connect(self.add_todo_f)
         self.switch_buy.clicked.connect(self.switch_buy_f)
         self.switch_to_do.clicked.connect(self.switch_to_do_f)
         self.switch_progress.clicked.connect(self.switch_progress_f)
+        self.switch_all_tasks.clicked.connect(self.switch_all_tasks_f)
         self.start_programm()
 
     def start_programm(self):
@@ -59,6 +63,7 @@ class MyWidget(QMainWindow):
         self.todo.resize(0, 0)
         self.delete_2.resize(0, 0)
         self.clear_progress()
+        self.clear_all_tasks()
 
         data = open(self.PATH_TO_TODO_JSON).read()
         self.to_dos = json.loads(data)
@@ -81,15 +86,16 @@ class MyWidget(QMainWindow):
         os.remove(self.PATH_ALL_TODOS_JSON)
         g = open(self.PATH_TO_TODO_JSON, mode='w').write(json.dumps(self.to_dos, ensure_ascii=False))
         g = open(self.PATH_ALL_TODOS_JSON, mode='w').write(json.dumps(self.all_to_dos, ensure_ascii=False))
-        self.x = 350
+        self.x = 70
         self.y = 288
         data = open(self.PATH_TO_TODO_JSON).read()
         self.to_dos = json.loads(data)['to_do']
 
         for i in range(len(self.to_dos)):
             self.arr_to_dos.append(
-                [QLabel(self), QLabel(self), QPushButton(self), self.to_dos[i]['status'], self.to_dos[i]['text'],
-                 self.to_dos[i]['time'], QLabel(self), self.to_dos[i]['date'], QPushButton(self)])
+                [QLabel(self.groupBox_2), QLabel(self.groupBox_2), QPushButton(self.groupBox_2),
+                 self.to_dos[i]['status'], self.to_dos[i]['text'],
+                 self.to_dos[i]['time'], QLabel(self.groupBox_2), self.to_dos[i]['date'], QPushButton(self.groupBox_2)])
             self.show_elem_todo()
 
     def show_elem_todo(self):  # Функция создает стили и показывает элемент списка дел
@@ -224,25 +230,11 @@ class MyWidget(QMainWindow):
         # Чтобы переключиться на другую вкладку
         self.switch_buy.setIcon(QIcon(self.PATH_TO_BUYS_NOACTIVE_ICON))
         self.groupBox_3.resize(0, 0)
-        for i in range(len(self.arr_buys)):
-            self.arr_buys[i][0].resize(0, 0)
-            self.arr_buys[i][1].resize(0, 0)
-            self.arr_buys[i][2].resize(0, 0)
-            self.arr_buys[i][6].resize(0, 0)
-            self.arr_buys[i][8].resize(0, 0)
-            self.arr_buys[i][9].resize(0, 0)
-            self.arr_buys[i][11].resize(0, 0)
 
     def clear_to_dos(self):
         # Функция изменения размера всех элементов СПИСКА ДЕЛ до нуля
         # Для того, чтобы вывести другую вкладку
         self.groupBox_2.resize(0, 0)
-        for i in range(len(self.arr_to_dos)):
-            self.arr_to_dos[i][0].resize(0, 0)
-            self.arr_to_dos[i][1].resize(0, 0)
-            self.arr_to_dos[i][2].resize(0, 0)
-            self.arr_to_dos[i][6].resize(0, 0)
-            self.arr_to_dos[i][8].resize(0, 0)
         self.switch_to_do.setIcon(QIcon(self.PATH_TO_TODO_NOACTIVE_ICON))
 
     def delete_buy_f(self):
@@ -332,10 +324,11 @@ class MyWidget(QMainWindow):
             g = open(self.PATH_TO_BUY_JSON, mode='w').write(json.dumps(a, ensure_ascii=False))
 
             # Добавление элемента в массив и его отображение
-            self.arr_buys.append([QLabel(self), QLabel(self), QPushButton(self), 'not_buy', text,
-                                  str(price * int(self.count_inp.text())), QLabel(self), date, QPushButton(self),
-                                  QLabel(self),
-                                  self.count_inp.text(), QLabel(self)])
+            self.arr_buys.append(
+                [QLabel(self.groupBox_3), QLabel(self.groupBox_3), QPushButton(self.groupBox_3), 'not_buy', text,
+                 str(price * int(self.count_inp.text())), QLabel(self.groupBox_3), date, QPushButton(self.groupBox_3),
+                 QLabel(self.groupBox_3),
+                 self.count_inp.text(), QLabel(self.groupBox_3)])
 
             self.show_elem_buy()
         except Exception as e:
@@ -390,7 +383,7 @@ class MyWidget(QMainWindow):
         os.remove(self.PATH_ALL_BUYS_JSON)
         g = open(self.PATH_TO_BUY_JSON, mode='w').write(json.dumps(self.buys, ensure_ascii=False))
         g = open(self.PATH_ALL_BUYS_JSON, mode='w').write(json.dumps(self.all_buys, ensure_ascii=False))
-        self.x = 350
+        self.x = 70
         self.arr_buys = []
         self.y = 288
         data = open(self.PATH_TO_BUY_JSON).read()
@@ -398,9 +391,11 @@ class MyWidget(QMainWindow):
         print(self.buys)
         for i in range(len(self.buys)):
             self.arr_buys.append(
-                [QLabel(self), QLabel(self), QPushButton(self), self.buys[i]['status'], self.buys[i]['text'],
-                 str(int(self.buys[i]['price']) * int(self.buys[i]['count'])), QLabel(self), self.buys[i]['date'],
-                 QPushButton(self), QLabel(self), self.buys[i]['count'], QLabel(self)])
+                [QLabel(self.groupBox_3), QLabel(self.groupBox_3), QPushButton(self.groupBox_3), self.buys[i]['status'],
+                 self.buys[i]['text'],
+                 str(int(self.buys[i]['price']) * int(self.buys[i]['count'])), QLabel(self.groupBox_3),
+                 self.buys[i]['date'],
+                 QPushButton(self.groupBox_3), QLabel(self.groupBox_3), self.buys[i]['count'], QLabel(self.groupBox_3)])
             self.show_elem_buy()
 
     def switch_to_do_f(self):
@@ -411,15 +406,16 @@ class MyWidget(QMainWindow):
         self.y = 288
         self.clear_buy()
         self.clear_progress()
+        self.clear_all_tasks()
         self.switch_to_do.setIcon(QIcon(self.PATH_TO_TODO_ACTIVE_ICON))
-
-        for i in range(len(self.arr_to_dos)):
-            self.y += 80
-            self.arr_to_dos[i][0].resize(1323, 45)
-            self.arr_to_dos[i][1].resize(77, 33)
-            self.arr_to_dos[i][2].resize(40, 40)
-            self.arr_to_dos[i][6].resize(self.arr_to_dos[i][6].sizeHint())
-            self.arr_to_dos[i][8].resize(31, 38)
+        self.start_programm()
+        # for i in range(len(self.arr_to_dos)):
+        #     self.y += 80
+        #     self.arr_to_dos[i][0].resize(1323, 45)
+        #     self.arr_to_dos[i][1].resize(77, 33)
+        #     self.arr_to_dos[i][2].resize(40, 40)
+        #     self.arr_to_dos[i][6].resize(self.arr_to_dos[i][6].sizeHint())
+        #     self.arr_to_dos[i][8].resize(31, 38)
 
     def delete_todo(self):
         # Функция для удаления задачи. Она удаляет задачу из json файла.
@@ -488,6 +484,7 @@ class MyWidget(QMainWindow):
         self.switch_progress.setIcon(QIcon(self.PATH_TO_ACTIVE_PROGRESS_ICON))
         self.clear_buy()
         self.clear_to_dos()
+        self.clear_all_tasks()
         # Вывод потраченных сумм по дням
         self.already_buys = json.loads(open(self.PATH_ALL_BUYS_JSON).read())
         sort_for_date = sorted(self.already_buys['all_buys'], key=lambda x: (
@@ -520,6 +517,38 @@ class MyWidget(QMainWindow):
         self.graphicsView.plot([i for i in range(len(dones))],
                                [count for count in dones], pen='r')
 
+    def clear_all_tasks(self):
+        # Функция для изменения размера всех элементов вкладки "Все дела"
+        self.all_tasks_scroll.resize(0, 0)
+        for i in range(len(self.arr_to_dos)):
+            self.arr_to_dos[i][0].resize(0, 0)
+            self.arr_to_dos[i][1].resize(0, 0)
+            self.arr_to_dos[i][2].resize(0, 0)
+            self.arr_to_dos[i][6].resize(0, 0)
+            self.arr_to_dos[i][8].resize(0, 0)
+        self.switch_all_tasks.setIcon(QIcon(self.PATH_TO_NOACTIVE_ALL_TASKS_ICON))
+
+    def switch_all_tasks_f(self):
+        # Функция очистки пространства для переключения на вкладку "Все дела"
+        self.clear_progress()
+        self.clear_to_dos()
+        self.clear_buy()
+        self.all_tasks_scroll.resize(1671, 1071)
+        self.switch_all_tasks.setIcon(QIcon(self.PATH_TO_ACTIVE_ALL_TASKS_ICON))
+        self.arr_to_dos = []
+        data = open(self.PATH_ALL_TODOS_JSON).read()
+        self.to_dos = json.loads(data)['all_to_dos']
+        self.y = 80
+        self.all_tasks_scroll.setWidgetResizable(True)
+        for i in range(len(self.to_dos)):
+            self.arr_to_dos.append(
+                [QLabel(self.all_tasks_scroll), QLabel(self.all_tasks_scroll), QPushButton(self.all_tasks_scroll),
+                 self.to_dos[i]['status'], self.to_dos[i]['text'],
+                 self.to_dos[i]['time'], QLabel(self.all_tasks_scroll), self.to_dos[i]['date'],
+                 QPushButton(self.all_tasks_scroll)])
+            self.show_elem_todo()
+        print(self.all_tasks_scroll.size())
+
     def add_todo_f(self):
         # Проверка правильности ввода
         time = self.inp_time_todo.text().split(':')
@@ -546,8 +575,8 @@ class MyWidget(QMainWindow):
 
         # Создание элемента
         self.arr_to_dos.append(
-            [QLabel(self), QLabel(self), QPushButton(self), 'not_do', textt,
-             time[0] + ':' + time[1], QLabel(self), date, QPushButton(self)])
+            [QLabel(self.groupBox_2), QLabel(self.groupBox_2), QPushButton(self.groupBox_2), 'not_do', textt,
+             time[0] + ':' + time[1], QLabel(self.groupBox_2), date, QPushButton(self.groupBox_2)])
 
         self.show_elem_todo()
 

@@ -1,6 +1,6 @@
 import sys
-from PyQt5.QtWidgets import QWidget, QApplication, QPushButton, QSpinBox
-from PyQt5.QtWidgets import QInputDialog
+from PyQt5.QtWidgets import QWidget, QApplication, QPushButton, QSpinBox, QScrollArea, QVBoxLayout, QScrollBar
+from PyQt5.QtCore import Qt
 
 
 class Example(QWidget):
@@ -9,22 +9,24 @@ class Example(QWidget):
         self.initUI()
 
     def initUI(self):
-        self.setGeometry(300, 300, 150, 150)
+        self.setGeometry(300, 300, 700, 700)
         self.setWindowTitle('Диалоговые окна')
 
-        self.s = QSpinBox(self)
-        self.s.resize(50, 50)
-        self.s.move(100, 100)
-        self.b = QPushButton('Показать', self)
-        self.b.resize(self.b.sizeHint())
-        self.b.move(50, 50)
-        self.b.clicked.connect(self.run)
-        print(self.s.text())
-
+        self.sca = QScrollArea(self)
+        self.b = QPushButton('Да', self.sca)
+        self.b.resize(50, 50)
+        self.b.move(50, 100)
+        self.b2 = QPushButton('нет', self.sca)
+        self.b2.resize(50, 50)
+        self.b2.move(10, 300)
+        self.sca.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.sca.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.sca.setHorizontalScrollBar(QScrollBar(self.b2))
         self.show()
 
     def run(self):
         print(self.s.text())
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
