@@ -1,9 +1,11 @@
 import sys
 from PyQt5 import uic, QtCore
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton, QLineEdit, QLabel, QGroupBox, QInputDialog, \
-    QVBoxLayout, QColorDialog, QScrollArea
+    QVBoxLayout, QColorDialog, QScrollArea, QScrollBar
 from PyQt5.QtGui import QPixmap, QIcon
 from PIL import Image, ImageDraw
+from PyQt5.QtCore import Qt
+from change_note import Change_note
 import json
 import os
 import datetime
@@ -58,6 +60,12 @@ class MyWidget(QMainWindow):
         self.switch_progress.clicked.connect(self.switch_progress_f)
         self.switch_all_tasks.clicked.connect(self.switch_all_tasks_f)
         self.switch_notes.clicked.connect(self.switch_notes_f)
+        data = open(self.PATH_TO_NOTES_JSON).read()
+        js_f = json.loads(data)
+        if len(js_f['notes']) > 0:
+            self.last_note_id = int(js_f['notes'][-1]['id'])
+        else:
+            self.last_note_id = 0
         self.start_programm()
 
     def start_programm(self):
@@ -94,16 +102,32 @@ class MyWidget(QMainWindow):
         os.remove(self.PATH_ALL_TODOS_JSON)
         g = open(self.PATH_TO_TODO_JSON, mode='w').write(json.dumps(self.to_dos, ensure_ascii=False))
         g = open(self.PATH_ALL_TODOS_JSON, mode='w').write(json.dumps(self.all_to_dos, ensure_ascii=False))
+
+        self.scroll_tasks = QScrollArea(self.groupBox_2)
+        self.tasks_gb = QGroupBox(self.groupBox_2)
+        self.len_scroll_task = 810
+        if len(self.to_dos['to_do']) * 80 + 80 >= self.len_scroll_task:
+            self.tasks_gb.resize(1671, len(self.to_dos['to_do']) * 80 + 80)
+        else:
+            self.tasks_gb.resize(1671, self.len_scroll_task)
+
+        self.scroll_tasks.setWidget(self.tasks_gb)
+        self.scroll_tasks.resize(1635, 805)
+        self.scroll_tasks.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll_tasks.move(0, 200)
+        self.scroll_tasks.show()
+        self.tasks_gb.show()
+
         self.x = 70
-        self.y = 288
+        self.y = 20
         data = open(self.PATH_TO_TODO_JSON).read()
         self.to_dos = json.loads(data)['to_do']
 
         for i in range(len(self.to_dos)):
             self.arr_to_dos.append(
-                [QLabel(self.groupBox_2), QLabel(self.groupBox_2), QPushButton(self.groupBox_2),
+                [QLabel(self.tasks_gb), QLabel(self.tasks_gb), QPushButton(self.tasks_gb),
                  self.to_dos[i]['status'], self.to_dos[i]['text'],
-                 self.to_dos[i]['time'], QLabel(self.groupBox_2), self.to_dos[i]['date'], QPushButton(self.groupBox_2)])
+                 self.to_dos[i]['time'], QLabel(self.tasks_gb), self.to_dos[i]['date'], QPushButton(self.tasks_gb)])
             self.show_elem_todo()
 
     def show_elem_todo(self):  # Функция создает стили и показывает элемент списка дел
@@ -283,6 +307,10 @@ class MyWidget(QMainWindow):
             self.arr_buys[i][9].move(self.arr_buys[i][9].x(), self.arr_buys[i][9].y() - 80)
             self.arr_buys[i][11].move(self.arr_buys[i][11].x(), self.arr_buys[i][11].y() - 80)
 
+        if len(self.arr_buys) * 80 > self.len_scroll_buy:
+            self.buys_gb.resize(1630, len(self.arr_buys) * 80)
+        else:
+            self.buys_gb.resize(1630, self.len_scroll_buy)
         self.y -= 80
 
     def change_buy_not_buy_button(self):
@@ -333,10 +361,12 @@ class MyWidget(QMainWindow):
 
             # Добавление элемента в массив и его отображение
             self.arr_buys.append(
-                [QLabel(self.groupBox_3), QLabel(self.groupBox_3), QPushButton(self.groupBox_3), 'not_buy', text,
-                 str(price * int(self.count_inp.text())), QLabel(self.groupBox_3), date, QPushButton(self.groupBox_3),
-                 QLabel(self.groupBox_3),
-                 self.count_inp.text(), QLabel(self.groupBox_3)])
+                [QLabel(self.buys_gb), QLabel(self.buys_gb), QPushButton(self.buys_gb), 'not_buy', text,
+                 str(price * int(self.count_inp.text())), QLabel(self.buys_gb), date, QPushButton(self.buys_gb),
+                 QLabel(self.buys_gb),
+                 self.count_inp.text(), QLabel(self.buys_gb)])
+            if len(self.arr_buys) * 80 >= self.len_scroll_buy:
+                self.buys_gb.resize(1630, len(self.arr_buys) * 80 + 80)
 
             self.show_elem_buy()
         except Exception as e:
@@ -393,20 +423,39 @@ class MyWidget(QMainWindow):
         os.remove(self.PATH_ALL_BUYS_JSON)
         g = open(self.PATH_TO_BUY_JSON, mode='w').write(json.dumps(self.buys, ensure_ascii=False))
         g = open(self.PATH_ALL_BUYS_JSON, mode='w').write(json.dumps(self.all_buys, ensure_ascii=False))
+
+        self.len_scroll_buy = 690
+
+        self.scroll_buys = QScrollArea(self.groupBox_3)
+        self.buys_gb = QGroupBox(self.groupBox_3)
+
+        self.scroll_buys.setWidget(self.buys_gb)
+        self.scroll_buys.resize(1630, self.len_scroll_buy + 2)
+        self.scroll_buys.move(0, 200)
+        self.scroll_buys.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll_buys.show()
+        self.buys_gb.show()
+        self.y = 20
+
         self.x = 70
         self.arr_buys = []
-        self.y = 288
+
         data = open(self.PATH_TO_BUY_JSON).read()
         self.buys = json.loads(data)['buy']
         print(self.buys)
         for i in range(len(self.buys)):
             self.arr_buys.append(
-                [QLabel(self.groupBox_3), QLabel(self.groupBox_3), QPushButton(self.groupBox_3), self.buys[i]['status'],
+                [QLabel(self.buys_gb), QLabel(self.buys_gb), QPushButton(self.buys_gb), self.buys[i]['status'],
                  self.buys[i]['text'],
-                 str(int(self.buys[i]['price']) * int(self.buys[i]['count'])), QLabel(self.groupBox_3),
+                 str(int(self.buys[i]['price']) * int(self.buys[i]['count'])), QLabel(self.buys_gb),
                  self.buys[i]['date'],
-                 QPushButton(self.groupBox_3), QLabel(self.groupBox_3), self.buys[i]['count'], QLabel(self.groupBox_3)])
+                 QPushButton(self.buys_gb), QLabel(self.buys_gb), self.buys[i]['count'], QLabel(self.buys_gb)])
             self.show_elem_buy()
+
+        if len(self.buys) * 80 + 80 > self.len_scroll_buy:
+            self.buys_gb.resize(1630, len(self.buys) * 80 + 80)
+        else:
+            self.buys_gb.resize(1630, self.len_scroll_buy)
 
     def switch_to_do_f(self):
         # Функция очистки программы от других вкладок для переключения на вкладку "Список дел"
@@ -420,13 +469,6 @@ class MyWidget(QMainWindow):
         self.clear_notes()
         self.switch_to_do.setIcon(QIcon(self.PATH_TO_TODO_ACTIVE_ICON))
         self.start_programm()
-        # for i in range(len(self.arr_to_dos)):
-        #     self.y += 80
-        #     self.arr_to_dos[i][0].resize(1323, 45)
-        #     self.arr_to_dos[i][1].resize(77, 33)
-        #     self.arr_to_dos[i][2].resize(40, 40)
-        #     self.arr_to_dos[i][6].resize(self.arr_to_dos[i][6].sizeHint())
-        #     self.arr_to_dos[i][8].resize(31, 38)
 
     def delete_todo(self):
         # Функция для удаления задачи. Она удаляет задачу из json файла.
@@ -457,7 +499,10 @@ class MyWidget(QMainWindow):
             self.arr_to_dos[i][2].move(self.arr_to_dos[i][2].x(), self.arr_to_dos[i][2].y() - 80)
             self.arr_to_dos[i][6].move(self.arr_to_dos[i][6].x(), self.arr_to_dos[i][6].y() - 80)
             self.arr_to_dos[i][8].move(self.arr_to_dos[i][8].x(), self.arr_to_dos[i][8].y() - 80)
-
+        if self.tasks_gb.size().height() - 80 >= self.len_scroll_task:
+            self.tasks_gb.resize(1671, self.tasks_gb.size().height() - 80)
+        else:
+            self.tasks_gb.resize(1671, self.len_scroll_task)
         self.y -= 80
 
     def change_todo_button(self):
@@ -619,9 +664,9 @@ class MyWidget(QMainWindow):
         # Стили для текста заметки
         self.arr_notes[-1][1].setStyleSheet('color: rgb(255, 255, 255)')
         self.arr_notes[-1][1].setText(self.arr_notes[-1][4])
-        self.arr_notes[-1][1].resize(1400, 45)
+        self.arr_notes[-1][1].resize(1200, 45)
         self.arr_notes[-1][1].setFont(self.text_todo.font())
-        self.arr_notes[-1][1].move(self.x + 30, self.y - 4)
+        self.arr_notes[-1][1].move(self.x + 70, self.y - 4)
         self.arr_notes[-1][1].setCursor(self.text_todo.cursor())
         self.arr_notes[-1][1].show()
 
@@ -641,7 +686,66 @@ class MyWidget(QMainWindow):
         self.arr_notes[-1][3].move(self.x - 68, self.y + 40)
         self.arr_notes[-1][3].show()
 
+        # Стили для кнопки "Редактировать"
+        self.arr_notes[-1][7].setStyleSheet('color: rgb(255, 255, 255)')
+        self.arr_notes[-1][7].resize(121, 41)
+        self.arr_notes[-1][7].setCursor(self.change_note.cursor())
+        self.arr_notes[-1][7].setFont(self.change_note.font())
+        self.arr_notes[-1][7].move(self.x + 1300, self.y - 4)
+        self.arr_notes[-1][7].clicked.connect(self.change_note_f)
+        self.arr_notes[-1][7].show()
         self.y += 80
+
+    def change_open_note(self):
+        if self.change_note_window.note_text.toPlainText() == '':
+            self.change_note_window.close()
+            return False
+        print(self.change_note_window.note_text.toPlainText())
+        data = json.loads(open(self.PATH_TO_NOTES_JSON).read())
+
+        if self.change_note_window.red.isChecked():
+            self.change_note_window.notes_color = (255, 0, 0, 255)
+        elif self.change_note_window.blue.isChecked():
+            self.change_note_window.notes_color = (0, 0, 255, 255)
+        elif self.change_note_window.pink.isChecked():
+            self.change_note_window.notes_color = (255, 0, 246, 255)
+        r, g, b, a = list(map(str, list(self.change_note_window.notes_color)))
+        for i in range(len(data['notes'])):
+            if data['notes'][i]['id'] == self.change_note_window.note_id:
+                self.arr_notes[i][1].setText(self.change_note_window.note_text.toPlainText())
+                self.arr_notes[i][5] = self.change_note_window.notes_color
+                data['notes'][i]['text'] = self.change_note_window.note_text.toPlainText()
+                data['notes'][i]['r'] = r
+                data['notes'][i]['g'] = g
+                data['notes'][i]['b'] = b
+                data['notes'][i]['a'] = a
+
+                image = Image.new('RGBA', (35, 35))
+                draw = ImageDraw.Draw(image)
+                draw.ellipse((0, 0, 35, 35), fill=self.change_note_window.notes_color)
+                image.save('ellipse.png')
+                pix = QPixmap('ellipse.png')
+                self.arr_notes[i][0].setPixmap(pix)
+                break
+        os.remove(self.PATH_TO_NOTES_JSON)
+        g = open(self.PATH_TO_NOTES_JSON, mode='w').write(json.dumps(data, ensure_ascii=False))
+
+        self.change_note_window.close()
+
+    def close_open_note(self):
+        self.change_note_window.close()
+
+    def change_note_f(self):
+        # Функция для вызова окна редактирования заметки
+        for i in range(len(self.arr_notes)):
+            if self.sender() is self.arr_notes[i][7]:
+                id = str(self.arr_notes[i][6])
+                color = self.arr_notes[i][5]
+                break
+        self.change_note_window = Change_note(id, self, color)
+        self.change_note_window.ok_btn.clicked.connect(self.change_open_note)
+        self.change_note_window.cancel_btn.clicked.connect(self.close_open_note)
+        self.change_note_window.show()
 
     def delete_notes(self):
         result, okBtnPressed = QInputDialog.getItem(self, 'Удаление заметки',
@@ -662,6 +766,7 @@ class MyWidget(QMainWindow):
                 self.arr_notes[i][1].resize(0, 0)
                 self.arr_notes[i][2].resize(0, 0)
                 self.arr_notes[i][3].resize(0, 0)
+                self.arr_notes[i][7].resize(0, 0)
                 break
         del self.arr_notes[ind]
 
@@ -670,6 +775,7 @@ class MyWidget(QMainWindow):
             self.arr_notes[i][1].move(self.arr_notes[i][1].x(), self.arr_notes[i][1].y() - 80)
             self.arr_notes[i][2].move(self.arr_notes[i][2].x(), self.arr_notes[i][2].y() - 80)
             self.arr_notes[i][3].move(self.arr_notes[i][3].x(), self.arr_notes[i][3].y() - 80)
+            self.arr_notes[i][7].move(self.arr_notes[i][7].x(), self.arr_notes[i][7].y() - 80)
         if self.notes_gb.size().height() - 90 >= 580:
             self.notes_gb.resize(1671, self.notes_gb.size().height() - 90)
         else:
@@ -681,10 +787,8 @@ class MyWidget(QMainWindow):
         if self.text_note.toPlainText() == '':
             return False
 
-        if self.notes_gb.size().height() + 90 >= 580:
+        if (len(self.arr_notes) + 1) * 90 + 90 >= 580:
             self.notes_gb.resize(1671, self.notes_gb.size().height() + 90)
-        else:
-            self.notes_gb.resize(1671, 580)
 
         if self.red.isChecked():
             self.notes_color = (255, 0, 0, 255)
@@ -695,7 +799,7 @@ class MyWidget(QMainWindow):
         self.arr_notes.append(
             [QLabel(self.notes_gb), QLabel(self.notes_gb), QPushButton(self.notes_gb), QLabel(self.notes_gb),
              self.text_note.toPlainText(),
-             self.notes_color])
+             self.notes_color, str(self.last_note_id + 1), QPushButton('Редактировать', self.notes_gb)])
         self.show_elem_notes()
         self.choice_color_btn.setIcon(QIcon(self.PATH_TO_CHOICE_NOTE_COLOR_ICON))
         # Запись в json файл
@@ -707,7 +811,10 @@ class MyWidget(QMainWindow):
         r, g, b, a = self.notes_color
         r, g, b, a = str(r), str(g), str(b), str(a)
         print(type(self.text_note.toPlainText()))
-        js_f['notes'].append({'text': self.text_note.toPlainText(), 'r': r, 'g': g, 'b': b, 'a': a, 'data': date})
+        js_f['notes'].append(
+            {'text': self.text_note.toPlainText(), 'r': r, 'g': g, 'b': b, 'a': a, 'data': date,
+             'id': str(self.last_note_id + 1)})
+        self.last_note_id += 1
         os.remove(self.PATH_TO_NOTES_JSON)
         g = open(self.PATH_TO_NOTES_JSON, mode='w').write(json.dumps(js_f, ensure_ascii=False))
         self.text_note.setText('')
@@ -741,15 +848,16 @@ class MyWidget(QMainWindow):
         data = open(self.PATH_TO_NOTES_JSON).read()
         self.notes = json.loads(data)['notes']
         self.arr_notes = []
-        if len(self.notes) * 90 + 80 >= 580:
-            self.notes_gb.resize(1671, len(self.notes) * 90 + 80)
+        if len(self.notes) * 90 + 90 >= 580:
+            self.notes_gb.resize(1671, len(self.notes) * 90 + 90)
         else:
             self.notes_gb.resize(1671, 580)
         for i in range(len(self.notes)):
             self.arr_notes.append(
                 [QLabel(self.notes_gb), QLabel(self.notes_gb), QPushButton(self.notes_gb), QLabel(self.notes_gb),
                  self.notes[i]['text'],
-                 (int(self.notes[i]['r']), int(self.notes[i]['g']), int(self.notes[i]['b']), int(self.notes[i]['a']))])
+                 (int(self.notes[i]['r']), int(self.notes[i]['g']), int(self.notes[i]['b']), int(self.notes[i]['a'])),
+                 self.notes[i]['id'], QPushButton('Редактировать', self.notes_gb)])
             self.show_elem_notes()
 
     def add_todo_f(self):
@@ -778,9 +886,10 @@ class MyWidget(QMainWindow):
 
         # Создание элемента
         self.arr_to_dos.append(
-            [QLabel(self.groupBox_2), QLabel(self.groupBox_2), QPushButton(self.groupBox_2), 'not_do', textt,
-             time[0] + ':' + time[1], QLabel(self.groupBox_2), date, QPushButton(self.groupBox_2)])
-
+            [QLabel(self.tasks_gb), QLabel(self.tasks_gb), QPushButton(self.tasks_gb), 'not_do', textt,
+             time[0] + ':' + time[1], QLabel(self.tasks_gb), date, QPushButton(self.tasks_gb)])
+        if len(self.arr_to_dos) * 80 >= self.len_scroll_task:
+            self.tasks_gb.resize(1671, self.tasks_gb.size().height() + 80)
         self.show_elem_todo()
 
         print(len(self.arr_to_dos))
