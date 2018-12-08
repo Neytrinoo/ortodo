@@ -1,8 +1,9 @@
 import sys
 from PyQt5 import uic, QtCore
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton, QLineEdit, QLabel, QGroupBox, QInputDialog, \
-    QVBoxLayout
+    QVBoxLayout, QColorDialog, QScrollArea
 from PyQt5.QtGui import QPixmap, QIcon
+from PIL import Image, ImageDraw
 import json
 import os
 import datetime
@@ -44,13 +45,19 @@ class MyWidget(QMainWindow):
         self.PATH_TO_ACTIVE_PROGRESS_ICON = 'Дизайн/icons/Прогресс активный.png'
         self.PATH_TO_NOACTIVE_ALL_TASKS_ICON = 'Дизайн/icons/Все дела неактивное.png'
         self.PATH_TO_ACTIVE_ALL_TASKS_ICON = 'Дизайн/icons/Все дела активное.png'
+        self.PATH_TO_NOACTIVE_NOTES_ICON = 'Дизайн/icons/Заметки неактивные.png'
+        self.PATH_TO_ACTIVE_NOTES_ICON = 'Дизайн/icons/Заметки активные.png'
+        self.PATH_TO_NOTES_JSON = 'notes.json'
+        self.PATH_TO_CHOICE_NOTE_COLOR_ICON = 'Дизайн/icons/выбор цвета.png'
 
         self.arr_buys = []
+        self.all_tasks_scroll = QScrollArea(self)
         self.add_todo.clicked.connect(self.add_todo_f)
         self.switch_buy.clicked.connect(self.switch_buy_f)
         self.switch_to_do.clicked.connect(self.switch_to_do_f)
         self.switch_progress.clicked.connect(self.switch_progress_f)
         self.switch_all_tasks.clicked.connect(self.switch_all_tasks_f)
+        self.switch_notes.clicked.connect(self.switch_notes_f)
         self.start_programm()
 
     def start_programm(self):
@@ -64,6 +71,7 @@ class MyWidget(QMainWindow):
         self.delete_2.resize(0, 0)
         self.clear_progress()
         self.clear_all_tasks()
+        self.clear_notes()
 
         data = open(self.PATH_TO_TODO_JSON).read()
         self.to_dos = json.loads(data)
@@ -340,6 +348,8 @@ class MyWidget(QMainWindow):
         # И изменения размеров элементов вкладки "Покупки" до НОРМАЛЬНОГО состояния
         self.clear_to_dos()
         self.clear_progress()
+        self.clear_notes()
+        self.clear_all_tasks()
         self.y = 288
         self.switch_buy.setIcon(QIcon(self.PATH_TO_BUYS_ACTIVE_ICON))
         self.groupBox_3.resize(1670, 1071)
@@ -407,6 +417,7 @@ class MyWidget(QMainWindow):
         self.clear_buy()
         self.clear_progress()
         self.clear_all_tasks()
+        self.clear_notes()
         self.switch_to_do.setIcon(QIcon(self.PATH_TO_TODO_ACTIVE_ICON))
         self.start_programm()
         # for i in range(len(self.arr_to_dos)):
@@ -485,6 +496,7 @@ class MyWidget(QMainWindow):
         self.clear_buy()
         self.clear_to_dos()
         self.clear_all_tasks()
+        self.clear_notes()
         # Вывод потраченных сумм по дням
         self.already_buys = json.loads(open(self.PATH_ALL_BUYS_JSON).read())
         sort_for_date = sorted(self.already_buys['all_buys'], key=lambda x: (
@@ -533,21 +545,212 @@ class MyWidget(QMainWindow):
         self.clear_progress()
         self.clear_to_dos()
         self.clear_buy()
+        self.clear_notes()
         self.all_tasks_scroll.resize(1671, 1071)
         self.switch_all_tasks.setIcon(QIcon(self.PATH_TO_ACTIVE_ALL_TASKS_ICON))
         self.arr_to_dos = []
         data = open(self.PATH_ALL_TODOS_JSON).read()
         self.to_dos = json.loads(data)['all_to_dos']
         self.y = 80
-        self.all_tasks_scroll.setWidgetResizable(True)
+
+        self.all_tasks_scroll.resize(1671, 1071)
+
+        self.all_tasks_gb = QGroupBox(self)
+        self.all_tasks_gb.resize(1671, len(self.to_dos) * 90)
+        self.all_tasks_scroll.move(280, -10)
         for i in range(len(self.to_dos)):
             self.arr_to_dos.append(
-                [QLabel(self.all_tasks_scroll), QLabel(self.all_tasks_scroll), QPushButton(self.all_tasks_scroll),
+                [QLabel(self.all_tasks_gb), QLabel(self.all_tasks_gb), QPushButton(self.all_tasks_gb),
                  self.to_dos[i]['status'], self.to_dos[i]['text'],
-                 self.to_dos[i]['time'], QLabel(self.all_tasks_scroll), self.to_dos[i]['date'],
-                 QPushButton(self.all_tasks_scroll)])
+                 self.to_dos[i]['time'], QLabel(self.all_tasks_gb), self.to_dos[i]['date'],
+                 QPushButton(self.all_tasks_gb)])
             self.show_elem_todo()
-        print(self.all_tasks_scroll.size())
+        self.all_tasks_scroll.setWidget(self.all_tasks_gb)
+        self.all_tasks_gb.show()
+        self.all_tasks_scroll.show()
+        print(self.all_tasks_gb.size())
+
+    def clear_notes(self):
+        self.groupBox_5.resize(0, 0)
+        self.switch_notes.setIcon(QIcon(self.PATH_TO_NOACTIVE_NOTES_ICON))
+
+    def set_color_show(self):
+        # Функция для показа или убирания GroupBox'а с выбором цвета для заметки
+        if self.choice_color_status:
+            self.choice_color.resize(0, 0)
+            self.choice_color_status = False
+        else:
+            self.choice_color.resize(60, 210)
+            self.choice_color_status = True
+
+    def yourself_choice_color(self):
+        color = QColorDialog.getColor()
+        if color.isValid():
+            image = Image.new('RGBA', (35, 35))
+            draw = ImageDraw.Draw(image)
+
+            # Сбрасывание выбора других цветов
+            self.red.setAutoExclusive(False)
+            self.red.setChecked(False)
+            self.blue.setAutoExclusive(False)
+            self.blue.setChecked(False)
+            self.pink.setAutoExclusive(False)
+            self.pink.setChecked(False)
+
+            self.notes_color = color.getRgb()
+            draw.ellipse((0, 0, 35, 35), fill=color.getRgb())
+            image.save('ellipse.png')
+            print(color.getRgb())
+            self.choice_color_btn.setIcon(QIcon('ellipse.png'))
+
+    def show_elem_notes(self):
+        # Функция для отображения элементов заметок
+        # Стили для иконки цвета заметки
+        image = Image.new('RGBA', (35, 35))
+        draw = ImageDraw.Draw(image)
+        draw.ellipse((0, 0, 35, 35), fill=self.arr_notes[-1][5])
+        image.save('ellipse.png')
+        pix = QPixmap('ellipse.png')
+        self.arr_notes[-1][0].setPixmap(pix)
+        self.arr_notes[-1][0].resize(35, 35)
+        self.arr_notes[-1][0].move(self.x - 45, self.y)
+        self.arr_notes[-1][0].show()
+
+        # Стили для текста заметки
+        self.arr_notes[-1][1].setStyleSheet('color: rgb(255, 255, 255)')
+        self.arr_notes[-1][1].setText(self.arr_notes[-1][4])
+        self.arr_notes[-1][1].resize(1400, 45)
+        self.arr_notes[-1][1].setFont(self.text_todo.font())
+        self.arr_notes[-1][1].move(self.x + 30, self.y - 4)
+        self.arr_notes[-1][1].setCursor(self.text_todo.cursor())
+        self.arr_notes[-1][1].show()
+
+        # Стили для кнопки удаления заметки
+        self.arr_notes[-1][2].setIcon(self.delete_buy.icon())
+        self.arr_notes[-1][2].resize(31, 38)
+        self.arr_notes[-1][2].setIconSize(self.delete_buy.iconSize())
+        self.arr_notes[-1][2].setCursor(self.delete_buy.cursor())
+        self.arr_notes[-1][2].move(self.x + 1470, self.y - 3)
+        self.arr_notes[-1][2].clicked.connect(self.delete_notes)
+        self.arr_notes[-1][2].show()
+
+        # Стили для линии
+        pix = QPixmap(self.PATH_TO_LINE_ICON)
+        self.arr_notes[-1][3].setPixmap(pix)
+        self.arr_notes[-1][3].resize(self.arr_notes[-1][3].sizeHint())
+        self.arr_notes[-1][3].move(self.x - 68, self.y + 40)
+        self.arr_notes[-1][3].show()
+
+        self.y += 80
+
+    def delete_notes(self):
+        result, okBtnPressed = QInputDialog.getItem(self, 'Удаление заметки',
+                                                    'Вы действительно хотите удалить заметку?',
+                                                    ('Да', 'Нет'), 0, False)
+        if result == 'Нет' or not okBtnPressed:
+            return False
+        ind = 0
+        for i in range(len(self.arr_notes)):
+            if self.sender() is self.arr_notes[i][2]:  # Перезапись json файла и изменение размера удаленного дела
+                data = open(self.PATH_TO_NOTES_JSON).read()
+                a = json.loads(data)
+                del a['notes'][i]
+                os.remove(self.PATH_TO_NOTES_JSON)
+                ind = i
+                g = open(self.PATH_TO_NOTES_JSON, mode='w').write(json.dumps(a, ensure_ascii=False))
+                self.arr_notes[i][0].resize(0, 0)
+                self.arr_notes[i][1].resize(0, 0)
+                self.arr_notes[i][2].resize(0, 0)
+                self.arr_notes[i][3].resize(0, 0)
+                break
+        del self.arr_notes[ind]
+
+        for i in range(ind, len(self.arr_notes)):  # Перемещение последующих задач
+            self.arr_notes[i][0].move(self.arr_notes[i][0].x(), self.arr_notes[i][0].y() - 80)
+            self.arr_notes[i][1].move(self.arr_notes[i][1].x(), self.arr_notes[i][1].y() - 80)
+            self.arr_notes[i][2].move(self.arr_notes[i][2].x(), self.arr_notes[i][2].y() - 80)
+            self.arr_notes[i][3].move(self.arr_notes[i][3].x(), self.arr_notes[i][3].y() - 80)
+        if self.notes_gb.size().height() - 90 >= 580:
+            self.notes_gb.resize(1671, self.notes_gb.size().height() - 90)
+        else:
+            self.notes_gb.resize(1671, 580)
+        self.y -= 80
+
+    def add_note_f(self):
+        # Функция для добавления заметки в json файл и вывод заметки на экран
+        if self.text_note.toPlainText() == '':
+            return False
+
+        if self.notes_gb.size().height() + 90 >= 580:
+            self.notes_gb.resize(1671, self.notes_gb.size().height() + 90)
+        else:
+            self.notes_gb.resize(1671, 580)
+
+        if self.red.isChecked():
+            self.notes_color = (255, 0, 0, 255)
+        elif self.blue.isChecked():
+            self.notes_color = (0, 0, 255, 255)
+        elif self.pink.isChecked():
+            self.notes_color = (255, 0, 246, 255)
+        self.arr_notes.append(
+            [QLabel(self.notes_gb), QLabel(self.notes_gb), QPushButton(self.notes_gb), QLabel(self.notes_gb),
+             self.text_note.toPlainText(),
+             self.notes_color])
+        self.show_elem_notes()
+        self.choice_color_btn.setIcon(QIcon(self.PATH_TO_CHOICE_NOTE_COLOR_ICON))
+        # Запись в json файл
+        data = open(self.PATH_TO_NOTES_JSON).read()
+        js_f = json.loads(data)
+        date = str(datetime.datetime.today().date()).split('-')
+        date = date[2] + '.' + date[1] + '.' + date[0]
+
+        r, g, b, a = self.notes_color
+        r, g, b, a = str(r), str(g), str(b), str(a)
+        print(type(self.text_note.toPlainText()))
+        js_f['notes'].append({'text': self.text_note.toPlainText(), 'r': r, 'g': g, 'b': b, 'a': a, 'data': date})
+        os.remove(self.PATH_TO_NOTES_JSON)
+        g = open(self.PATH_TO_NOTES_JSON, mode='w').write(json.dumps(js_f, ensure_ascii=False))
+        self.text_note.setText('')
+        self.notes_color = (0, 255, 0, 255)
+
+    def switch_notes_f(self):
+        # Функция для переключения на вкладку "Заметки"
+        self.groupBox_5.resize(1671, 1071)
+        self.add_notes.clicked.connect(self.add_note_f)
+        self.switch_notes.setIcon(QIcon(self.PATH_TO_ACTIVE_NOTES_ICON))
+        self.clear_all_tasks()
+        self.notes_color = (0, 255, 0, 255)
+        self.clear_buy()
+        self.clear_to_dos()
+        self.clear_progress()
+        self.choice_color_status = False
+        self.choice_color.resize(0, 0)
+        self.choice_color_btn.clicked.connect(self.set_color_show)
+        self.yourself_color.clicked.connect(self.yourself_choice_color)
+
+        self.scroll_notes = QScrollArea(self.groupBox_5)
+        self.notes_gb = QGroupBox(self.groupBox_5)
+
+        self.scroll_notes.setWidget(self.notes_gb)
+        self.scroll_notes.resize(1630, 800)
+        self.scroll_notes.move(0, 440)
+        self.scroll_notes.show()
+        self.notes_gb.show()
+        self.y = 10
+
+        data = open(self.PATH_TO_NOTES_JSON).read()
+        self.notes = json.loads(data)['notes']
+        self.arr_notes = []
+        if len(self.notes) * 90 + 80 >= 580:
+            self.notes_gb.resize(1671, len(self.notes) * 90 + 80)
+        else:
+            self.notes_gb.resize(1671, 580)
+        for i in range(len(self.notes)):
+            self.arr_notes.append(
+                [QLabel(self.notes_gb), QLabel(self.notes_gb), QPushButton(self.notes_gb), QLabel(self.notes_gb),
+                 self.notes[i]['text'],
+                 (int(self.notes[i]['r']), int(self.notes[i]['g']), int(self.notes[i]['b']), int(self.notes[i]['a']))])
+            self.show_elem_notes()
 
     def add_todo_f(self):
         # Проверка правильности ввода
