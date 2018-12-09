@@ -51,6 +51,9 @@ class MyWidget(QMainWindow):
         self.PATH_TO_ACTIVE_NOTES_ICON = 'Дизайн/icons/Заметки активные.png'
         self.PATH_TO_NOTES_JSON = 'notes.json'
         self.PATH_TO_CHOICE_NOTE_COLOR_ICON = 'Дизайн/icons/выбор цвета.png'
+        self.PATH_TO_ACTIVE_ALL_BUYS_ICON = 'Дизайн/icons/все покупки активные.png'
+        self.PATH_TO_NOACTIVE_ALL_BUYS_ICON = 'Дизайн/icons/все покупки неактивные.png'
+        self.PATH_TO_ALL_BUYS_JSON = 'all_buys.json'
 
         self.arr_buys = []
         self.all_tasks_scroll = QScrollArea(self)
@@ -60,6 +63,9 @@ class MyWidget(QMainWindow):
         self.switch_progress.clicked.connect(self.switch_progress_f)
         self.switch_all_tasks.clicked.connect(self.switch_all_tasks_f)
         self.switch_notes.clicked.connect(self.switch_notes_f)
+        self.choice_color_btn.clicked.connect(self.set_color_show)
+        self.switch_all_buys.clicked.connect(self.switch_all_buys_f)
+
         data = open(self.PATH_TO_NOTES_JSON).read()
         js_f = json.loads(data)
         if len(js_f['notes']) > 0:
@@ -76,6 +82,7 @@ class MyWidget(QMainWindow):
         self.arr_to_dos = []
         self.not_todo.resize(0, 0)
         self.todo.resize(0, 0)
+        self.clear_all_buys()
         self.delete_2.resize(0, 0)
         self.clear_progress()
         self.clear_all_tasks()
@@ -332,11 +339,18 @@ class MyWidget(QMainWindow):
                     js = 'not_buy'
                     ind = i
                     self.arr_buys[i][3] = 'not_buy'
-        data = open(self.PATH_TO_BUY_JSON).read()
+        if self.groupBox_3.size().height() != 0:
+            path_js = self.PATH_TO_BUY_JSON
+        else:
+            path_js = self.PATH_TO_ALL_BUYS_JSON
+        data = open(path_js).read()
         a = json.loads(data)
-        a['buy'][ind]['status'] = js
-        os.remove(self.PATH_TO_BUY_JSON)
-        g = open(self.PATH_TO_BUY_JSON, mode='w').write(json.dumps(a, ensure_ascii=False))
+        if path_js == self.PATH_TO_BUY_JSON:
+            a['buy'][ind]['status'] = js
+        else:
+            a['all_buys'][ind]['status'] = js
+        os.remove(path_js)
+        g = open(path_js, mode='w').write(json.dumps(a, ensure_ascii=False))
 
     def add_buy_f(self):
         # Функция добавления покупки в json файл, проверки правильности ввода
@@ -380,6 +394,7 @@ class MyWidget(QMainWindow):
         self.clear_progress()
         self.clear_notes()
         self.clear_all_tasks()
+        self.clear_all_buys()
         self.y = 288
         self.switch_buy.setIcon(QIcon(self.PATH_TO_BUYS_ACTIVE_ICON))
         self.groupBox_3.resize(1670, 1071)
@@ -402,6 +417,7 @@ class MyWidget(QMainWindow):
         self.itogo_icon.resize(self.itogo_icon.sizeHint())
         self.already_pay_icon.resize(self.itogo_icon.sizeHint())
 
+        # Проверка выполненных покупок за предыдущие дни
         data = open(self.PATH_TO_BUY_JSON).read()
         self.buys = json.loads(data)
         l = json.loads(data)
@@ -464,6 +480,7 @@ class MyWidget(QMainWindow):
         self.groupBox_2.resize(1670, 1071)
         self.y = 288
         self.clear_buy()
+        self.clear_all_buys()
         self.clear_progress()
         self.clear_all_tasks()
         self.clear_notes()
@@ -480,12 +497,21 @@ class MyWidget(QMainWindow):
         ind = 0
         for i in range(len(self.arr_to_dos)):
             if self.sender() is self.arr_to_dos[i][8]:  # Перезапись json файла и изменение размера удаленного дела
-                data = open(self.PATH_TO_TODO_JSON).read()
+                if self.groupBox_2.size().height() != 0:
+                    path_js = self.PATH_TO_TODO_JSON
+                    tasks = True
+                else:
+                    tasks = False
+                    path_js = self.PATH_ALL_TODOS_JSON
+                data = open(path_js).read()
                 a = json.loads(data)
-                del a['to_do'][i]
-                os.remove(self.PATH_TO_TODO_JSON)
+                if tasks:
+                    del a['to_do'][i]
+                else:
+                    del a['all_to_dos'][i]
+                os.remove(path_js)
                 ind = i
-                g = open(self.PATH_TO_TODO_JSON, mode='w').write(json.dumps(a, ensure_ascii=False))
+                g = open(path_js, mode='w').write(json.dumps(a, ensure_ascii=False))
                 self.arr_to_dos[i][0].resize(0, 0)
                 self.arr_to_dos[i][1].resize(0, 0)
                 self.arr_to_dos[i][2].resize(0, 0)
@@ -499,10 +525,17 @@ class MyWidget(QMainWindow):
             self.arr_to_dos[i][2].move(self.arr_to_dos[i][2].x(), self.arr_to_dos[i][2].y() - 80)
             self.arr_to_dos[i][6].move(self.arr_to_dos[i][6].x(), self.arr_to_dos[i][6].y() - 80)
             self.arr_to_dos[i][8].move(self.arr_to_dos[i][8].x(), self.arr_to_dos[i][8].y() - 80)
-        if self.tasks_gb.size().height() - 80 >= self.len_scroll_task:
-            self.tasks_gb.resize(1671, self.tasks_gb.size().height() - 80)
+
+        if tasks:
+            if self.tasks_gb.size().height() - 80 >= self.len_scroll_task:
+                self.tasks_gb.resize(1671, self.tasks_gb.size().height() - 80)
+            else:
+                self.tasks_gb.resize(1671, self.len_scroll_task)
         else:
-            self.tasks_gb.resize(1671, self.len_scroll_task)
+            if self.all_tasks_gb.size().height() - 80 >= 1041:
+                self.all_tasks_gb.resize(1631, self.all_tasks_gb.size().height() - 80)
+            else:
+                self.all_tasks_gb.resize(1631, 1041)
         self.y -= 80
 
     def change_todo_button(self):
@@ -518,17 +551,26 @@ class MyWidget(QMainWindow):
                     js = 'do'
                     ind = i
                     self.arr_to_dos[i][3] = 'do'
+                    break
                 else:
                     self.sender().setIcon(self.not_todo.icon())
                     self.sender().setIconSize(self.not_todo.iconSize())
                     js = 'not_do'
                     ind = i
                     self.arr_to_dos[i][3] = 'not_do'
-        data = open(self.PATH_TO_TODO_JSON).read()
-        a = json.loads(data)
-        a['to_do'][ind]['status'] = js
-        os.remove(self.PATH_TO_TODO_JSON)
-        g = open(self.PATH_TO_TODO_JSON, mode='w').write(json.dumps(a, ensure_ascii=False))
+                    break
+        if self.groupBox_2.size().height() != 0:
+            data = open(self.PATH_TO_TODO_JSON).read()
+            a = json.loads(data)
+            a['to_do'][ind]['status'] = js
+            os.remove(self.PATH_TO_TODO_JSON)
+            g = open(self.PATH_TO_TODO_JSON, mode='w').write(json.dumps(a, ensure_ascii=False))
+        else:
+            data = open(self.PATH_ALL_TODOS_JSON).read()
+            a = json.loads(data)
+            a['all_to_dos'][ind]['status'] = js
+            os.remove(self.PATH_ALL_TODOS_JSON)
+            g = open(self.PATH_ALL_TODOS_JSON, mode='w').write(json.dumps(a, ensure_ascii=False))
 
     def clear_progress(self):
         # Очистка вкладки "Прогресс" для переключения на другие вкладки
@@ -540,13 +582,13 @@ class MyWidget(QMainWindow):
         self.switch_progress.setIcon(QIcon(self.PATH_TO_ACTIVE_PROGRESS_ICON))
         self.clear_buy()
         self.clear_to_dos()
+        self.clear_all_buys()
         self.clear_all_tasks()
         self.clear_notes()
         # Вывод потраченных сумм по дням
         self.already_buys = json.loads(open(self.PATH_ALL_BUYS_JSON).read())
         sort_for_date = sorted(self.already_buys['all_buys'], key=lambda x: (
             x['date'].split('.')[2], x['date'].split('.')[1], x['date'].split('.')[0]))
-        print(sort_for_date)
         prices = {}
         for elem in sort_for_date:
             if elem['date'] in prices:
@@ -554,7 +596,6 @@ class MyWidget(QMainWindow):
             else:
                 prices[elem['date']] = int(elem['price'])
         prices = [j for i, j in prices.items()]
-        print(prices)
         self.graphicsBuys.plot([i for i in range(len(prices))],
                                [price for price in prices], pen='r')
 
@@ -563,14 +604,12 @@ class MyWidget(QMainWindow):
         sort_for_date = sorted(self.already_done['all_to_dos'], key=lambda x: (
             x['date'].split('.')[2], x['date'].split('.')[1], x['date'].split('.')[0]))
         dones = {}
-        print(sort_for_date)
         for elem in sort_for_date:
             if elem['date'] in dones:
                 dones[elem['date']] += 1
             else:
                 dones[elem['date']] = 1
         dones = [j for i, j in dones.items()]
-        print(dones)
         self.graphicsView.plot([i for i in range(len(dones))],
                                [count for count in dones], pen='r')
 
@@ -590,19 +629,19 @@ class MyWidget(QMainWindow):
         self.clear_progress()
         self.clear_to_dos()
         self.clear_buy()
+        self.clear_all_buys()
         self.clear_notes()
-        self.all_tasks_scroll.resize(1671, 1071)
         self.switch_all_tasks.setIcon(QIcon(self.PATH_TO_ACTIVE_ALL_TASKS_ICON))
         self.arr_to_dos = []
         data = open(self.PATH_ALL_TODOS_JSON).read()
         self.to_dos = json.loads(data)['all_to_dos']
         self.y = 80
 
-        self.all_tasks_scroll.resize(1671, 1071)
+        self.all_tasks_scroll.resize(1631, 1041)
 
         self.all_tasks_gb = QGroupBox(self)
         self.all_tasks_gb.resize(1671, len(self.to_dos) * 90)
-        self.all_tasks_scroll.move(280, -10)
+        self.all_tasks_scroll.move(280, -2)
         for i in range(len(self.to_dos)):
             self.arr_to_dos.append(
                 [QLabel(self.all_tasks_gb), QLabel(self.all_tasks_gb), QPushButton(self.all_tasks_gb),
@@ -625,8 +664,11 @@ class MyWidget(QMainWindow):
             self.choice_color.resize(0, 0)
             self.choice_color_status = False
         else:
-            self.choice_color.resize(60, 210)
             self.choice_color_status = True
+            self.choice_color.resize(60, 210)
+            self.choice_color.show()
+
+        print(self.choice_color.size())
 
     def yourself_choice_color(self):
         color = QColorDialog.getColor()
@@ -830,9 +872,9 @@ class MyWidget(QMainWindow):
         self.clear_buy()
         self.clear_to_dos()
         self.clear_progress()
+        self.clear_all_buys()
         self.choice_color_status = False
         self.choice_color.resize(0, 0)
-        self.choice_color_btn.clicked.connect(self.set_color_show)
         self.yourself_color.clicked.connect(self.yourself_choice_color)
 
         self.scroll_notes = QScrollArea(self.groupBox_5)
@@ -859,6 +901,59 @@ class MyWidget(QMainWindow):
                  (int(self.notes[i]['r']), int(self.notes[i]['g']), int(self.notes[i]['b']), int(self.notes[i]['a'])),
                  self.notes[i]['id'], QPushButton('Редактировать', self.notes_gb)])
             self.show_elem_notes()
+
+    def clear_all_buys(self):
+        # Функция для очистки вкладки Все покупки
+        self.switch_all_buys.setIcon(QIcon(self.PATH_TO_NOACTIVE_ALL_BUYS_ICON))
+        self.groupBox_6.resize(0, 0)
+
+    def switch_all_buys_f(self):
+        # Функция для переключения на вкладку Все покупки
+        self.switch_all_buys.setIcon(QIcon(self.PATH_TO_ACTIVE_ALL_BUYS_ICON))
+        self.clear_notes()
+        self.clear_all_tasks()
+        self.clear_to_dos()
+        self.clear_buy()
+        self.clear_progress()
+        self.groupBox_6.resize(1671, 1071)
+        self.len_scroll_all_buy = 900
+
+        self.scroll_all_buys = QScrollArea(self.groupBox_6)
+        self.all_buys_gb = QGroupBox(self.groupBox_6)
+
+        self.scroll_all_buys.setWidget(self.all_buys_gb)
+        self.scroll_all_buys.resize(1631, self.len_scroll_all_buy)
+        self.scroll_all_buys.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll_all_buys.show()
+        self.all_buys_gb.show()
+        self.scroll_all_buys.move(0, 8)
+        self.y = 80
+
+        self.x = 70
+        self.arr_buys = []
+        self.all_price = 0
+        data = open(self.PATH_TO_ALL_BUYS_JSON).read()
+        self.buys = json.loads(data)['all_buys']
+        print(self.buys)
+        for i in range(len(self.buys)):
+            self.arr_buys.append(
+                [QLabel(self.all_buys_gb), QLabel(self.all_buys_gb), QPushButton(self.all_buys_gb),
+                 self.buys[i]['status'],
+                 self.buys[i]['text'],
+                 str(int(self.buys[i]['price']) * int(self.buys[i]['count'])), QLabel(self.all_buys_gb),
+                 self.buys[i]['date'],
+                 QPushButton(self.all_buys_gb), QLabel(self.all_buys_gb), self.buys[i]['count'],
+                 QLabel(self.all_buys_gb)])
+            self.all_price += int(self.buys[i]['price']) * int(self.buys[i]['count'])
+            self.show_elem_buy()
+        self.itogo_price_all.setText(str(self.all_price))
+        pix = QPixmap(self.PATH_TO_RUBLE_ICON)
+        self.itogo_icon_all.setPixmap(pix)
+        self.itogo_icon_all.resize(self.itogo_icon_all.sizeHint())
+        if len(self.buys) * 80 + 80 > self.len_scroll_all_buy:
+            self.all_buys_gb.resize(1630, len(self.buys) * 80 + 80)
+        else:
+            self.all_buys_gb.resize(1630, self.len_scroll_all_buy)
 
     def add_todo_f(self):
         # Проверка правильности ввода
