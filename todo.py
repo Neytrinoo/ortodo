@@ -287,15 +287,23 @@ class MyWidget(QMainWindow):
         ind = 0
         for i in range(len(self.arr_buys)):
             if self.sender() is self.arr_buys[i][8]:  # Перезапись json файла и изменение размера удаленного дела
-                data = open(self.PATH_TO_BUY_JSON).read()
+                if self.groupBox_3.size().height() != 0:
+                    path = self.PATH_TO_BUY_JSON
+                else:
+                    path = self.PATH_TO_ALL_BUYS_JSON
+                    self.itogo_price_all.setText(str(int(self.itogo_price_all.text()) - int(self.arr_buys[i][5])))
+                data = open(path).read()
                 if self.arr_buys[i][3] == 'buy':
                     self.already_pay.setText(str(int(self.already_pay.text()) - int(self.arr_buys[i][5])))
                 a = json.loads(data)
                 self.itogo_price.setText(str(int(self.itogo_price.text()) - int(self.arr_buys[i][5])))
-                del a['buy'][i]
-                os.remove(self.PATH_TO_BUY_JSON)
+                if path == self.PATH_TO_BUY_JSON:
+                    del a['buy'][i]
+                else:
+                    del a['all_buys'][i]
+                os.remove(path)
                 ind = i
-                g = open(self.PATH_TO_BUY_JSON, mode='w').write(json.dumps(a, ensure_ascii=False))
+                g = open(path, mode='w').write(json.dumps(a, ensure_ascii=False))
                 self.arr_buys[i][0].resize(0, 0)
                 self.arr_buys[i][1].resize(0, 0)
                 self.arr_buys[i][2].resize(0, 0)
@@ -313,11 +321,16 @@ class MyWidget(QMainWindow):
             self.arr_buys[i][8].move(self.arr_buys[i][8].x(), self.arr_buys[i][8].y() - 80)
             self.arr_buys[i][9].move(self.arr_buys[i][9].x(), self.arr_buys[i][9].y() - 80)
             self.arr_buys[i][11].move(self.arr_buys[i][11].x(), self.arr_buys[i][11].y() - 80)
-
-        if len(self.arr_buys) * 80 > self.len_scroll_buy:
-            self.buys_gb.resize(1630, len(self.arr_buys) * 80)
+        if path == self.PATH_TO_BUY_JSON:
+            if self.buys_gb.size().height() - 80 > self.len_scroll_buy:
+                self.buys_gb.resize(1630, self.buys_gb.size().height() - 80)
+            else:
+                self.buys_gb.resize(1630, self.len_scroll_buy)
         else:
-            self.buys_gb.resize(1630, self.len_scroll_buy)
+            if self.all_buys_gb.size().height() - 80 > self.len_scroll_all_buy:
+                self.all_buys_gb.resize(1631, self.all_buys_gb.size().height() - 80)
+            else:
+                self.all_buys_gb.resize(1631, self.len_scroll_all_buy)
         self.y -= 80
 
     def change_buy_not_buy_button(self):
@@ -332,6 +345,7 @@ class MyWidget(QMainWindow):
                     js = 'buy'
                     ind = i
                     self.arr_buys[i][3] = 'buy'
+                    break
                 else:
                     self.sender().setIcon(self.not_buy.icon())
                     self.sender().setIconSize(self.not_buy.iconSize())
@@ -339,10 +353,12 @@ class MyWidget(QMainWindow):
                     js = 'not_buy'
                     ind = i
                     self.arr_buys[i][3] = 'not_buy'
+                    break
         if self.groupBox_3.size().height() != 0:
             path_js = self.PATH_TO_BUY_JSON
         else:
             path_js = self.PATH_TO_ALL_BUYS_JSON
+            self.itogo_price_all.setText(str(int(self.itogo_price_all.text()) - int(self.arr_buys[ind][5])))
         data = open(path_js).read()
         a = json.loads(data)
         if path_js == self.PATH_TO_BUY_JSON:
@@ -517,6 +533,7 @@ class MyWidget(QMainWindow):
                 self.arr_to_dos[i][2].resize(0, 0)
                 self.arr_to_dos[i][6].resize(0, 0)
                 self.arr_to_dos[i][8].resize(0, 0)
+                break
         del self.arr_to_dos[ind]
 
         for i in range(ind, len(self.arr_to_dos)):  # Перемещение последующих задач
@@ -525,6 +542,9 @@ class MyWidget(QMainWindow):
             self.arr_to_dos[i][2].move(self.arr_to_dos[i][2].x(), self.arr_to_dos[i][2].y() - 80)
             self.arr_to_dos[i][6].move(self.arr_to_dos[i][6].x(), self.arr_to_dos[i][6].y() - 80)
             self.arr_to_dos[i][8].move(self.arr_to_dos[i][8].x(), self.arr_to_dos[i][8].y() - 80)
+        if not tasks:
+            self.clear_all_tasks()
+            self.switch_all_tasks_f()
 
         if tasks:
             if self.tasks_gb.size().height() - 80 >= self.len_scroll_task:
@@ -596,6 +616,7 @@ class MyWidget(QMainWindow):
             else:
                 prices[elem['date']] = int(elem['price'])
         prices = [j for i, j in prices.items()]
+        self.graphicsBuys.clear()
         self.graphicsBuys.plot([i for i in range(len(prices))],
                                [price for price in prices], pen='r')
 
@@ -610,6 +631,7 @@ class MyWidget(QMainWindow):
             else:
                 dones[elem['date']] = 1
         dones = [j for i, j in dones.items()]
+        self.graphicsView.clear()
         self.graphicsView.plot([i for i in range(len(dones))],
                                [count for count in dones], pen='r')
 
@@ -642,14 +664,35 @@ class MyWidget(QMainWindow):
         self.all_tasks_gb = QGroupBox(self)
         self.all_tasks_gb.resize(1671, len(self.to_dos) * 90)
         self.all_tasks_scroll.move(280, -2)
+        self.labels_date = [QLabel(self.all_tasks_gb)]
+        self.labels_date[0].setText(self.to_dos[0]['date'])
+        self.labels_date[0].setStyleSheet('color: rgb(7, 133, 250)')
+        self.labels_date[0].setFont(self.text_todo.font())
+        self.labels_date[0].resize(self.labels_date[0].sizeHint())
+        self.labels_date[0].move(self.x - 50, self.y - 30)
+        self.labels_date[0].show()
+        self.now_date = self.to_dos[0]['date']
+
         for i in range(len(self.to_dos)):
             self.arr_to_dos.append(
                 [QLabel(self.all_tasks_gb), QLabel(self.all_tasks_gb), QPushButton(self.all_tasks_gb),
                  self.to_dos[i]['status'], self.to_dos[i]['text'],
                  self.to_dos[i]['time'], QLabel(self.all_tasks_gb), self.to_dos[i]['date'],
                  QPushButton(self.all_tasks_gb)])
+            if self.now_date != self.to_dos[i]['date']:
+                self.now_date = self.to_dos[i]['date']
+                self.labels_date.append(QLabel(self.all_tasks_gb))
+                self.labels_date[-1].setText(self.to_dos[i]['date'])
+                self.labels_date[-1].setStyleSheet('color: rgb(7, 133, 250)')
+                self.labels_date[-1].setFont(self.text_todo.font())
+                self.labels_date[-1].resize(self.labels_date[0].sizeHint())
+                self.labels_date[-1].move(self.x - 50, self.y)
+                self.labels_date[-1].show()
+                self.y += 40
+
             self.show_elem_todo()
         self.all_tasks_scroll.setWidget(self.all_tasks_gb)
+        self.all_tasks_gb.resize(1671, len(self.to_dos) * 90 + len(self.labels_date) * 50)
         self.all_tasks_gb.show()
         self.all_tasks_scroll.show()
         print(self.all_tasks_gb.size())
