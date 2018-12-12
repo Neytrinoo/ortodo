@@ -951,8 +951,8 @@ border-color: rgb(255, 170, 255);
      <rect>
       <x>280</x>
       <y>-10</y>
-      <width>0</width>
-      <height>0</height>
+      <width>1671</width>
+      <height>1071</height>
      </rect>
     </property>
     <property name="font">
@@ -1809,7 +1809,7 @@ border-color: rgb(255, 170, 255);
     <widget class="QLabel" name="already_buy">
      <property name="geometry">
       <rect>
-       <x>1259</x>
+       <x>1139</x>
        <y>920</y>
        <width>101</width>
        <height>32</height>
@@ -1951,7 +1951,7 @@ border-color: rgb(255, 170, 255);
     <widget class="QLabel" name="already_pay">
      <property name="geometry">
       <rect>
-       <x>1380</x>
+       <x>1260</x>
        <y>920</y>
        <width>151</width>
        <height>33</height>
@@ -1969,7 +1969,7 @@ border-color: rgb(255, 170, 255);
     <widget class="QLabel" name="already_pay_icon">
      <property name="geometry">
       <rect>
-       <x>1528</x>
+       <x>1408</x>
        <y>910</y>
        <width>31</width>
        <height>16</height>
@@ -1982,7 +1982,7 @@ border-color: rgb(255, 170, 255);
     <widget class="QLabel" name="itogo_3">
      <property name="geometry">
       <rect>
-       <x>1289</x>
+       <x>1169</x>
        <y>960</y>
        <width>71</width>
        <height>32</height>
@@ -2127,7 +2127,7 @@ border-color: rgb(255, 170, 255);
     <widget class="QLabel" name="itogo_price">
      <property name="geometry">
       <rect>
-       <x>1380</x>
+       <x>1260</x>
        <y>960</y>
        <width>151</width>
        <height>33</height>
@@ -2145,7 +2145,7 @@ border-color: rgb(255, 170, 255);
     <widget class="QLabel" name="itogo_icon">
      <property name="geometry">
       <rect>
-       <x>1530</x>
+       <x>1410</x>
        <y>960</y>
        <width>31</width>
        <height>16</height>
@@ -2154,6 +2154,130 @@ border-color: rgb(255, 170, 255);
      <property name="text">
       <string/>
      </property>
+    </widget>
+    <widget class="QPushButton" name="change_currency">
+     <property name="geometry">
+      <rect>
+       <x>920</x>
+       <y>950</y>
+       <width>32</width>
+       <height>38</height>
+      </rect>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normalon>Дизайн/icons/Рубль.png</normalon>
+      </iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>26</width>
+       <height>36</height>
+      </size>
+     </property>
+    </widget>
+    <widget class="QGroupBox" name="change_currency_gb">
+     <property name="geometry">
+      <rect>
+       <x>920</x>
+       <y>900</y>
+       <width>136</width>
+       <height>50</height>
+      </rect>
+     </property>
+     <property name="toolTipDuration">
+      <number>-1</number>
+     </property>
+     <property name="title">
+      <string/>
+     </property>
+     <widget class="QPushButton" name="dollar_btn">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>5</y>
+        <width>24</width>
+        <height>39</height>
+       </rect>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normalon>Дизайн/icons/Доллар.png</normalon>
+       </iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>24</width>
+        <height>39</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="euro_btn">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>5</y>
+        <width>32</width>
+        <height>38</height>
+       </rect>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normalon>Дизайн/icons/Евро.png</normalon>
+       </iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>32</width>
+        <height>38</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="rubl_btn">
+      <property name="geometry">
+       <rect>
+        <x>98</x>
+        <y>5</y>
+        <width>26</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normalon>Дизайн/icons/Рубль.png</normalon>
+       </iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>26</width>
+        <height>36</height>
+       </size>
+      </property>
+     </widget>
     </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_4">
@@ -2800,8 +2924,8 @@ border-color: rgb(255, 170, 255);
      <rect>
       <x>280</x>
       <y>-10</y>
-      <width>1671</width>
-      <height>1071</height>
+      <width>0</width>
+      <height>0</height>
      </rect>
     </property>
     <property name="font">

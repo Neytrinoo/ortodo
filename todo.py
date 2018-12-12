@@ -6,6 +6,7 @@ from PyQt5.QtGui import QPixmap, QIcon
 from PIL import Image, ImageDraw
 from PyQt5.QtCore import Qt
 from change_note import Change_note
+from exchange_rate import get_html, parse
 import json
 import os
 import datetime
@@ -39,6 +40,8 @@ class MyWidget(QMainWindow):
         self.PATH_ALL_BUYS_JSON = 'all_buys.json'
         self.PATH_TO_LINE_ICON = 'Дизайн/icons/line.png'
         self.PATH_TO_RUBLE_ICON = 'Дизайн/icons/Рубль.png'
+        self.PATH_TO_DOLLAR_ICON = 'Дизайн/icons/Доллар.png'
+        self.PATH_TO_EURO_ICON = 'Дизайн/icons/Евро.png'
         self.PATH_TO_BUYS_NOACTIVE_ICON = 'Дизайн/icons/Покупки.png'
         self.PATH_TO_TODO_NOACTIVE_ICON = 'Дизайн/icons/Список дел неактивный.png'
         self.PATH_TO_BUYS_ACTIVE_ICON = 'Дизайн/icons/Покупки активные.png'
@@ -54,6 +57,15 @@ class MyWidget(QMainWindow):
         self.PATH_TO_ACTIVE_ALL_BUYS_ICON = 'Дизайн/icons/все покупки активные.png'
         self.PATH_TO_NOACTIVE_ALL_BUYS_ICON = 'Дизайн/icons/все покупки неактивные.png'
         self.PATH_TO_ALL_BUYS_JSON = 'all_buys.json'
+        self.URL_TO_CRB = 'http://cbr.ru'
+        self.CURRENCIES = ['rubl', 'usd', 'eur']
+        currency = parse(get_html(self.URL_TO_CRB))
+        if currency:
+            self.usd = currency[0]
+            self.eur = currency[1]
+        else:
+            self.usd = 60
+            self.eur = 70
 
         self.arr_buys = []
         self.all_tasks_scroll = QScrollArea(self)
@@ -65,6 +77,10 @@ class MyWidget(QMainWindow):
         self.switch_notes.clicked.connect(self.switch_notes_f)
         self.choice_color_btn.clicked.connect(self.set_color_show)
         self.switch_all_buys.clicked.connect(self.switch_all_buys_f)
+        self.change_currency.clicked.connect(self.change_currency_f)
+        self.dollar_btn.clicked.connect(self.to_dollar)
+        self.rubl_btn.clicked.connect(self.to_rubl)
+        self.euro_btn.clicked.connect(self.to_eur)
 
         data = open(self.PATH_TO_NOTES_JSON).read()
         js_f = json.loads(data)
@@ -79,6 +95,8 @@ class MyWidget(QMainWindow):
         self.groupBox_3.resize(0, 0)
         self.text_todo.resize(0, 0)
         self.time_todo.resize(0, 0)
+        self.inp_todo.returnPressed.connect(self.add_todo_f)
+        self.inp_time_todo.returnPressed.connect(self.add_todo_f)
         self.arr_to_dos = []
         self.not_todo.resize(0, 0)
         self.todo.resize(0, 0)
@@ -260,8 +278,18 @@ class MyWidget(QMainWindow):
         self.arr_buys[-1][11].show()
 
         if self.arr_buys[-1][3] == 'buy':
-            self.already_pay.setText(str(int(self.already_pay.text()) + int(self.arr_buys[-1][5])))
-        self.itogo_price.setText(str(int(self.itogo_price.text()) + int(self.arr_buys[-1][5])))
+            self.already_pay_rubl += int(self.arr_buys[-1][5])
+            self.already_pay.setText(str(self.already_pay_rubl))
+        self.itogo_price_rubl += int(self.arr_buys[-1][5])
+        self.itogo_price.setText(str(self.itogo_price_rubl))
+        if self.now_currency == self.CURRENCIES[1]:
+            self.now_currency = self.CURRENCIES[0]
+            self.already_pay.setText(str(self.already_pay_rubl))
+            self.to_dollar()
+        elif self.now_currency == self.CURRENCIES[2]:
+            self.now_currency = self.CURRENCIES[0]
+            self.already_pay.setText(str(self.already_pay_rubl))
+            self.to_eur()
         self.y += 80
 
     def clear_buy(self):
@@ -275,6 +303,87 @@ class MyWidget(QMainWindow):
         # Для того, чтобы вывести другую вкладку
         self.groupBox_2.resize(0, 0)
         self.switch_to_do.setIcon(QIcon(self.PATH_TO_TODO_NOACTIVE_ICON))
+
+    def change_currency_f(self):  # Функция для показа и скрытия GroupBox'а с иконками валют
+        if not self.active_change_currency:
+            self.change_currency_gb.resize(136, 50)
+            self.active_change_currency = True
+        else:
+            self.change_currency_gb.resize(0, 0)
+            self.active_change_currency = False
+
+    def to_dollar(self):
+        # Функция для перевода итоговой стоимости из рубля в доллары
+        itogo = float(self.itogo_price.text())
+        already = float(self.already_pay.text())
+        if self.now_currency == self.CURRENCIES[1]:
+            return False
+        elif self.now_currency == self.CURRENCIES[2]:
+            itogo *= self.eur
+            already *= self.eur
+        itogo /= self.usd
+        already /= self.usd
+        self.now_currency = self.CURRENCIES[1]
+        self.itogo_price.setText(str(round(itogo, 2)))
+        self.already_pay.setText(str(round(already, 2)))
+
+        pix = QPixmap(self.PATH_TO_DOLLAR_ICON)
+        self.itogo_icon.setPixmap(pix)
+        self.already_pay_icon.setPixmap(pix)
+        self.itogo_icon.resize(self.itogo_icon.sizeHint())
+        self.already_pay_icon.resize(self.itogo_icon.sizeHint())
+        self.change_currency.setIcon(QIcon(self.PATH_TO_DOLLAR_ICON))
+        self.change_currency_gb.resize(0, 0)
+        self.active_change_currency = False
+
+    def to_eur(self):
+        # Функция для перевода итоговой стоимости из рубля в доллары
+        itogo = float(self.itogo_price.text())
+        already = float(self.already_pay.text())
+        if self.now_currency == self.CURRENCIES[2]:
+            return False
+        elif self.now_currency == self.CURRENCIES[1]:
+            itogo *= self.usd
+            already *= self.usd
+        itogo /= self.eur
+        already /= self.eur
+
+        self.now_currency = self.CURRENCIES[2]
+        self.itogo_price.setText(str(round(itogo, 2)))
+        self.already_pay.setText(str(round(already, 2)))
+
+        pix = QPixmap(self.PATH_TO_EURO_ICON)
+        self.itogo_icon.setPixmap(pix)
+        self.already_pay_icon.setPixmap(pix)
+        self.itogo_icon.resize(self.itogo_icon.sizeHint())
+        self.already_pay_icon.resize(self.itogo_icon.sizeHint())
+        self.change_currency.setIcon(QIcon(self.PATH_TO_EURO_ICON))
+        self.change_currency_gb.resize(0, 0)
+        self.active_change_currency = False
+
+    def to_rubl(self):
+        # Функция для перевода итоговой стоимости в рубли
+        itogo = 0
+        already = 0
+        for i in range(len(self.arr_buys)):
+            print(self.arr_buys[i][5])
+            if self.arr_buys[i][3] == 'buy':
+                already += int(self.arr_buys[i][5])
+
+            itogo += int(self.arr_buys[i][5])
+        self.itogo_price.setText(str(itogo))
+        self.already_pay.setText(str(already))
+
+        self.now_currency = self.CURRENCIES[0]
+
+        pix = QPixmap(self.PATH_TO_RUBLE_ICON)
+        self.itogo_icon.setPixmap(pix)
+        self.already_pay_icon.setPixmap(pix)
+        self.itogo_icon.resize(self.itogo_icon.sizeHint())
+        self.already_pay_icon.resize(self.itogo_icon.sizeHint())
+        self.change_currency.setIcon(QIcon(self.PATH_TO_RUBLE_ICON))
+        self.change_currency_gb.resize(0, 0)
+        self.active_change_currency = False
 
     def delete_buy_f(self):
         # Функция для удаления задачи. Она удаляет задачу из json файла.
@@ -294,9 +403,20 @@ class MyWidget(QMainWindow):
                     self.itogo_price_all.setText(str(int(self.itogo_price_all.text()) - int(self.arr_buys[i][5])))
                 data = open(path).read()
                 if self.arr_buys[i][3] == 'buy':
-                    self.already_pay.setText(str(int(self.already_pay.text()) - int(self.arr_buys[i][5])))
+                    self.already_pay_rubl -= int(self.arr_buys[i][5])
+                    self.already_pay.setText(str(self.already_pay_rubl))
+
                 a = json.loads(data)
-                self.itogo_price.setText(str(int(self.itogo_price.text()) - int(self.arr_buys[i][5])))
+                self.itogo_price_rubl -= int(self.arr_buys[i][5])
+                self.already_pay.setText(str(self.already_pay_rubl))
+                self.itogo_price.setText(str(self.itogo_price_rubl))
+                if self.now_currency == self.CURRENCIES[1]:
+                    self.now_currency = self.CURRENCIES[0]
+                    self.to_dollar()
+                elif self.now_currency == self.CURRENCIES[2]:
+                    self.now_currency = self.CURRENCIES[0]
+                    self.to_eur()
+
                 if path == self.PATH_TO_BUY_JSON:
                     del a['buy'][i]
                 else:
@@ -341,7 +461,8 @@ class MyWidget(QMainWindow):
                 if self.arr_buys[i][3] == 'not_buy':
                     self.sender().setIcon(self.buy.icon())
                     self.sender().setIconSize(self.buy.iconSize())
-                    self.already_pay.setText(str(int(self.already_pay.text()) + int(self.arr_buys[i][5])))
+                    self.already_pay_rubl += int(self.arr_buys[i][5])
+
                     js = 'buy'
                     ind = i
                     self.arr_buys[i][3] = 'buy'
@@ -349,16 +470,30 @@ class MyWidget(QMainWindow):
                 else:
                     self.sender().setIcon(self.not_buy.icon())
                     self.sender().setIconSize(self.not_buy.iconSize())
-                    self.already_pay.setText(str(int(self.already_pay.text()) - int(self.arr_buys[i][5])))
+                    self.already_pay_rubl -= int(self.arr_buys[i][5])
+                    self.already_pay.setText(str(self.already_pay_rubl))
                     js = 'not_buy'
                     ind = i
                     self.arr_buys[i][3] = 'not_buy'
                     break
+        self.already_pay.setText(str(self.already_pay_rubl))
+        if self.now_currency == self.CURRENCIES[1]:
+            self.now_currency = self.CURRENCIES[0]
+            self.itogo_price.setText(str(self.itogo_price_rubl))
+            self.to_dollar()
+        elif self.now_currency == self.CURRENCIES[2]:
+            self.now_currency = self.CURRENCIES[0]
+            self.itogo_price.setText(str(self.itogo_price_rubl))
+            self.to_eur()
+
         if self.groupBox_3.size().height() != 0:
             path_js = self.PATH_TO_BUY_JSON
         else:
             path_js = self.PATH_TO_ALL_BUYS_JSON
-            self.itogo_price_all.setText(str(int(self.itogo_price_all.text()) - int(self.arr_buys[ind][5])))
+            if js == 'not_buy':
+                self.itogo_price_all.setText(str(int(self.itogo_price_all.text()) - int(self.arr_buys[ind][5])))
+            else:
+                self.itogo_price_all.setText(str(int(self.itogo_price_all.text()) + int(self.arr_buys[ind][5])))
         data = open(path_js).read()
         a = json.loads(data)
         if path_js == self.PATH_TO_BUY_JSON:
@@ -397,7 +532,6 @@ class MyWidget(QMainWindow):
                  self.count_inp.text(), QLabel(self.buys_gb)])
             if len(self.arr_buys) * 80 >= self.len_scroll_buy:
                 self.buys_gb.resize(1630, len(self.arr_buys) * 80 + 80)
-
             self.show_elem_buy()
         except Exception as e:
             print(e)
@@ -407,8 +541,10 @@ class MyWidget(QMainWindow):
         # Функция очистки программы от других вкладок для переключения на вкладку "Покупки"
         # И изменения размеров элементов вкладки "Покупки" до НОРМАЛЬНОГО состояния
         self.clear_to_dos()
+        self.change_currency_gb.resize(0, 0)
         self.clear_progress()
         self.clear_notes()
+        self.active_change_currency = False
         self.clear_all_tasks()
         self.clear_all_buys()
         self.y = 288
@@ -419,6 +555,9 @@ class MyWidget(QMainWindow):
         self.not_buy.resize(0, 0)
         self.buy.resize(0, 0)
         self.count.resize(0, 0)
+        self.product_inp.returnPressed.connect(self.add_buy_f)
+        self.price_inp.returnPressed.connect(self.add_buy_f)
+        self.now_currency = self.CURRENCIES[0]
         self.delete_buy.resize(0, 0)
         self.price_for_one.resize(0, 0)
         self.already_pay.setStyleSheet('color: rgb(7, 133, 250)')
@@ -474,7 +613,8 @@ class MyWidget(QMainWindow):
 
         data = open(self.PATH_TO_BUY_JSON).read()
         self.buys = json.loads(data)['buy']
-        print(self.buys)
+        self.itogo_price_rubl = 0
+        self.already_pay_rubl = 0
         for i in range(len(self.buys)):
             self.arr_buys.append(
                 [QLabel(self.buys_gb), QLabel(self.buys_gb), QPushButton(self.buys_gb), self.buys[i]['status'],
