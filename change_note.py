@@ -28,7 +28,7 @@ class Change_note(QMainWindow):
         self.choice_color_btn.clicked.connect(self.set_color_show)
         self.load_text()
 
-    def load_text(self):
+    def load_text(self): # Вывод текста заметки в TexEdit
         data = open(self.PATH_TO_NOTES_JSON).read()
         data = json.loads(data)['notes']
         for i in range(len(data)):
@@ -44,7 +44,7 @@ class Change_note(QMainWindow):
             self.choice_color.resize(60, 210)
             self.choice_color_status = True
 
-    def yourself_choice_color(self):
+    def yourself_choice_color(self): # функция для выбора своего цвета с помощью диалогового окна
         color = QColorDialog.getColor()
         if color.isValid():
             image = Image.new('RGBA', (35, 35))

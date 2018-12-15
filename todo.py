@@ -81,6 +81,7 @@ class MyWidget(QMainWindow):
         self.dollar_btn.clicked.connect(self.to_dollar)
         self.rubl_btn.clicked.connect(self.to_rubl)
         self.euro_btn.clicked.connect(self.to_eur)
+        self.yourself_color.clicked.connect(self.yourself_choice_color)
 
         data = open(self.PATH_TO_NOTES_JSON).read()
         js_f = json.loads(data)
@@ -831,6 +832,7 @@ class MyWidget(QMainWindow):
                 self.y += 40
 
             self.show_elem_todo()
+        # Добавление GroupBox'а со всеми виджетами в ScrollArea
         self.all_tasks_scroll.setWidget(self.all_tasks_gb)
         self.all_tasks_gb.resize(1671, len(self.to_dos) * 90 + len(self.labels_date) * 50)
         self.all_tasks_gb.show()
@@ -838,6 +840,7 @@ class MyWidget(QMainWindow):
         print(self.all_tasks_gb.size())
 
     def clear_notes(self):
+        # Функция для очистки вкладки "Заметки"
         self.groupBox_5.resize(0, 0)
         self.switch_notes.setIcon(QIcon(self.PATH_TO_NOACTIVE_NOTES_ICON))
 
@@ -854,6 +857,7 @@ class MyWidget(QMainWindow):
         print(self.choice_color.size())
 
     def yourself_choice_color(self):
+        # Функция для выбора своего цвета для заметки с помощью диалогового окна
         color = QColorDialog.getColor()
         if color.isValid():
             image = Image.new('RGBA', (35, 35))
@@ -921,19 +925,22 @@ class MyWidget(QMainWindow):
         self.arr_notes[-1][7].show()
         self.y += 80
 
-    def change_open_note(self):
+    def change_open_note(self): # Функция для изменения отредактированной заметки
         if self.change_note_window.note_text.toPlainText() == '':
             self.change_note_window.close()
             return False
         print(self.change_note_window.note_text.toPlainText())
         data = json.loads(open(self.PATH_TO_NOTES_JSON).read())
 
+        # Проверка цветовой маркеровки заметки
         if self.change_note_window.red.isChecked():
             self.change_note_window.notes_color = (255, 0, 0, 255)
         elif self.change_note_window.blue.isChecked():
             self.change_note_window.notes_color = (0, 0, 255, 255)
         elif self.change_note_window.pink.isChecked():
             self.change_note_window.notes_color = (255, 0, 246, 255)
+
+        # Изменение цвета заметки и перезапись цветов в json файле
         r, g, b, a = list(map(str, list(self.change_note_window.notes_color)))
         for i in range(len(data['notes'])):
             if data['notes'][i]['id'] == self.change_note_window.note_id:
@@ -980,7 +987,7 @@ class MyWidget(QMainWindow):
             return False
         ind = 0
         for i in range(len(self.arr_notes)):
-            if self.sender() is self.arr_notes[i][2]:  # Перезапись json файла и изменение размера удаленного дела
+            if self.sender() is self.arr_notes[i][2]:  # Перезапись json файла и изменение размера удаленной заметки
                 data = open(self.PATH_TO_NOTES_JSON).read()
                 a = json.loads(data)
                 del a['notes'][i]
@@ -995,7 +1002,7 @@ class MyWidget(QMainWindow):
                 break
         del self.arr_notes[ind]
 
-        for i in range(ind, len(self.arr_notes)):  # Перемещение последующих задач
+        for i in range(ind, len(self.arr_notes)):  # Перемещение последующих заметок
             self.arr_notes[i][0].move(self.arr_notes[i][0].x(), self.arr_notes[i][0].y() - 80)
             self.arr_notes[i][1].move(self.arr_notes[i][1].x(), self.arr_notes[i][1].y() - 80)
             self.arr_notes[i][2].move(self.arr_notes[i][2].x(), self.arr_notes[i][2].y() - 80)
@@ -1015,6 +1022,7 @@ class MyWidget(QMainWindow):
         if (len(self.arr_notes) + 1) * 90 + 90 >= 580:
             self.notes_gb.resize(1671, self.notes_gb.size().height() + 90)
 
+        # Проверка цвета заметки
         if self.red.isChecked():
             self.notes_color = (255, 0, 0, 255)
         elif self.blue.isChecked():
@@ -1058,7 +1066,7 @@ class MyWidget(QMainWindow):
         self.clear_all_buys()
         self.choice_color_status = False
         self.choice_color.resize(0, 0)
-        self.yourself_color.clicked.connect(self.yourself_choice_color)
+
 
         self.scroll_notes = QScrollArea(self.groupBox_5)
         self.notes_gb = QGroupBox(self.groupBox_5)

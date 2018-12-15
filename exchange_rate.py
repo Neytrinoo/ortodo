@@ -16,7 +16,7 @@ def parse(html):
         rubl = soup.findAll('td', class_='weak')
         usd = str(rubl[0]).split('</ins>')[1].split('</td>')[0].replace(',', '.')
         eur = str(rubl[1]).split('</ins>')[1].split('</td>')[0].replace(',', '.')
-        return [float(usd), float(eur)]
+        return [float(usd), float(eur)]  # Парсинг сайта центробанка и возврат курса доллара и евро
     except Exception as e:
         return False
 
