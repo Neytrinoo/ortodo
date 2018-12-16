@@ -7,37 +7,20 @@ from PIL import Image, ImageDraw
 from PyQt5.QtCore import Qt
 from change_note import Change_note
 from exchange_rate import get_html, parse
+from main_window import Ui_MainWindow
 import json
 import os
 import datetime
 
 
-class MyWidget(QMainWindow):
+class MyWidget(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('design.ui', self)
-        # self.b = QPushButton('', self)
-        # self.b.setIcon(self.add_todo.icon())
-        # self.b.resize(self.add_todo.size())
-        # self.b.setIconSize(self.add_todo.iconSize())
-        # self.b.setCursor(self.add_todo.cursor())
-        # self.b.move(500, 500)
-        # self.lab = QLabel(self)
-        # self.lab.setStyleSheet('color: rgb(50, 0, 70)')
-        # self.lab.setPalette(self.text_todo.palette())
-        # self.lab.setText(self.text_todo.text())
-        # self.lab.resize(self.text_todo.size())
-        # self.lab.setFont(self.text_todo.font())
-        # self.lab.move(100, 500)
-
-        # vbox = QVBoxLayout()
-        # vbox.addWidget(self.lab)
-        # vbox.addStretch(1)
-        # self.groupBox_2.resize(0, 0)
-        self.PATH_TO_TODO_JSON = 'to_do.json'
-        self.PATH_TO_BUY_JSON = 'buy.json'
-        self.PATH_ALL_TODOS_JSON = 'all_to_dos.json'
-        self.PATH_ALL_BUYS_JSON = 'all_buys.json'
+        self.setupUi(self)
+        self.PATH_TO_TODO_JSON = 'databases/to_do.json'
+        self.PATH_TO_BUY_JSON = 'databases/buy.json'
+        self.PATH_ALL_TODOS_JSON = 'databases/all_to_dos.json'
+        self.PATH_ALL_BUYS_JSON = 'databases/all_buys.json'
         self.PATH_TO_LINE_ICON = 'Дизайн/icons/line.png'
         self.PATH_TO_RUBLE_ICON = 'Дизайн/icons/Рубль.png'
         self.PATH_TO_DOLLAR_ICON = 'Дизайн/icons/Доллар.png'
@@ -52,11 +35,11 @@ class MyWidget(QMainWindow):
         self.PATH_TO_ACTIVE_ALL_TASKS_ICON = 'Дизайн/icons/Все дела активное.png'
         self.PATH_TO_NOACTIVE_NOTES_ICON = 'Дизайн/icons/Заметки неактивные.png'
         self.PATH_TO_ACTIVE_NOTES_ICON = 'Дизайн/icons/Заметки активные.png'
-        self.PATH_TO_NOTES_JSON = 'notes.json'
+        self.PATH_TO_NOTES_JSON = 'databases/notes.json'
         self.PATH_TO_CHOICE_NOTE_COLOR_ICON = 'Дизайн/icons/выбор цвета.png'
         self.PATH_TO_ACTIVE_ALL_BUYS_ICON = 'Дизайн/icons/все покупки активные.png'
         self.PATH_TO_NOACTIVE_ALL_BUYS_ICON = 'Дизайн/icons/все покупки неактивные.png'
-        self.PATH_TO_ALL_BUYS_JSON = 'all_buys.json'
+        self.PATH_TO_ALL_BUYS_JSON = 'databases/all_buys.json'
         self.URL_TO_CRB = 'http://cbr.ru'
         self.CURRENCIES = ['rubl', 'usd', 'eur']
         currency = parse(get_html(self.URL_TO_CRB))
@@ -107,6 +90,7 @@ class MyWidget(QMainWindow):
         self.clear_all_tasks()
         self.clear_notes()
 
+        # Проверка дел на дату, чтобы удалить выполненные из предыдущих дней
         data = open(self.PATH_TO_TODO_JSON).read()
         self.to_dos = json.loads(data)
         l = json.loads(data)
@@ -120,7 +104,6 @@ class MyWidget(QMainWindow):
             if self.to_dos['to_do'][i]['status'] == 'do' and (year < year_r or month < month_r or day < day_r):
                 self.all_to_dos['all_to_dos'].append(l['to_do'][ind])
                 del l['to_do'][ind]
-                print('опа')
                 ind -= 1
             ind += 1
         self.to_dos = l
@@ -277,20 +260,20 @@ class MyWidget(QMainWindow):
         self.arr_buys[-1][11].resize(self.arr_buys[-1][11].sizeHint())
         self.arr_buys[-1][11].move(self.x + 1260 - self.arr_buys[-1][11].size().width(), self.y + 10)
         self.arr_buys[-1][11].show()
-
-        if self.arr_buys[-1][3] == 'buy':
-            self.already_pay_rubl += int(self.arr_buys[-1][5])
-            self.already_pay.setText(str(self.already_pay_rubl))
-        self.itogo_price_rubl += int(self.arr_buys[-1][5])
-        self.itogo_price.setText(str(self.itogo_price_rubl))
-        if self.now_currency == self.CURRENCIES[1]:
-            self.now_currency = self.CURRENCIES[0]
-            self.already_pay.setText(str(self.already_pay_rubl))
-            self.to_dollar()
-        elif self.now_currency == self.CURRENCIES[2]:
-            self.now_currency = self.CURRENCIES[0]
-            self.already_pay.setText(str(self.already_pay_rubl))
-            self.to_eur()
+        if self.groupBox_3.size().height() != 0:
+            if self.arr_buys[-1][3] == 'buy':
+                self.already_pay_rubl += int(self.arr_buys[-1][5])
+                self.already_pay.setText(str(self.already_pay_rubl))
+            self.itogo_price_rubl += int(self.arr_buys[-1][5])
+            self.itogo_price.setText(str(self.itogo_price_rubl))
+            if self.now_currency == self.CURRENCIES[1]:
+                self.now_currency = self.CURRENCIES[0]
+                self.already_pay.setText(str(self.already_pay_rubl))
+                self.to_dollar()
+            elif self.now_currency == self.CURRENCIES[2]:
+                self.now_currency = self.CURRENCIES[0]
+                self.already_pay.setText(str(self.already_pay_rubl))
+                self.to_eur()
         self.y += 80
 
     def clear_buy(self):
@@ -353,6 +336,7 @@ class MyWidget(QMainWindow):
         self.itogo_price.setText(str(round(itogo, 2)))
         self.already_pay.setText(str(round(already, 2)))
 
+        # Изменение иконок валюты
         pix = QPixmap(self.PATH_TO_EURO_ICON)
         self.itogo_icon.setPixmap(pix)
         self.already_pay_icon.setPixmap(pix)
@@ -367,7 +351,6 @@ class MyWidget(QMainWindow):
         itogo = 0
         already = 0
         for i in range(len(self.arr_buys)):
-            print(self.arr_buys[i][5])
             if self.arr_buys[i][3] == 'buy':
                 already += int(self.arr_buys[i][5])
 
@@ -376,7 +359,7 @@ class MyWidget(QMainWindow):
         self.already_pay.setText(str(already))
 
         self.now_currency = self.CURRENCIES[0]
-
+        # Изменение иконок валюты
         pix = QPixmap(self.PATH_TO_RUBLE_ICON)
         self.itogo_icon.setPixmap(pix)
         self.already_pay_icon.setPixmap(pix)
@@ -455,6 +438,8 @@ class MyWidget(QMainWindow):
         self.y -= 80
 
     def change_buy_not_buy_button(self):
+        # Изменение кнопки покупки как выполненная/невыполненная
+        # А также изменение json файла
         js = ''
         ind = 0
         for i in range(len(self.arr_buys)):
@@ -587,7 +572,6 @@ class MyWidget(QMainWindow):
             if self.buys['buy'][i]['status'] == 'buy' and (year < year_r or month < month_r or day < day_r):
                 self.all_buys['all_buys'].append(l['buy'][ind])
                 del l['buy'][ind]
-                print('опа')
                 ind -= 1
             ind += 1
         self.buys = l
@@ -612,6 +596,7 @@ class MyWidget(QMainWindow):
         self.x = 70
         self.arr_buys = []
 
+        # Создание и отображение элементов
         data = open(self.PATH_TO_BUY_JSON).read()
         self.buys = json.loads(data)['buy']
         self.itogo_price_rubl = 0
@@ -814,6 +799,7 @@ class MyWidget(QMainWindow):
         self.labels_date[0].show()
         self.now_date = self.to_dos[0]['date']
 
+        # Создание и отображение элементов
         for i in range(len(self.to_dos)):
             self.arr_to_dos.append(
                 [QLabel(self.all_tasks_gb), QLabel(self.all_tasks_gb), QPushButton(self.all_tasks_gb),
@@ -837,7 +823,6 @@ class MyWidget(QMainWindow):
         self.all_tasks_gb.resize(1671, len(self.to_dos) * 90 + len(self.labels_date) * 50)
         self.all_tasks_gb.show()
         self.all_tasks_scroll.show()
-        print(self.all_tasks_gb.size())
 
     def clear_notes(self):
         # Функция для очистки вкладки "Заметки"
@@ -853,8 +838,6 @@ class MyWidget(QMainWindow):
             self.choice_color_status = True
             self.choice_color.resize(60, 210)
             self.choice_color.show()
-
-        print(self.choice_color.size())
 
     def yourself_choice_color(self):
         # Функция для выбора своего цвета для заметки с помощью диалогового окна
@@ -874,7 +857,6 @@ class MyWidget(QMainWindow):
             self.notes_color = color.getRgb()
             draw.ellipse((0, 0, 35, 35), fill=color.getRgb())
             image.save('ellipse.png')
-            print(color.getRgb())
             self.choice_color_btn.setIcon(QIcon('ellipse.png'))
 
     def show_elem_notes(self):
@@ -925,11 +907,10 @@ class MyWidget(QMainWindow):
         self.arr_notes[-1][7].show()
         self.y += 80
 
-    def change_open_note(self): # Функция для изменения отредактированной заметки
+    def change_open_note(self):  # Функция для изменения отредактированной заметки
         if self.change_note_window.note_text.toPlainText() == '':
             self.change_note_window.close()
             return False
-        print(self.change_note_window.note_text.toPlainText())
         data = json.loads(open(self.PATH_TO_NOTES_JSON).read())
 
         # Проверка цветовой маркеровки заметки
@@ -964,7 +945,7 @@ class MyWidget(QMainWindow):
 
         self.change_note_window.close()
 
-    def close_open_note(self):
+    def close_open_note(self):  # закрытие окна редактирования заметки
         self.change_note_window.close()
 
     def change_note_f(self):
@@ -1043,7 +1024,6 @@ class MyWidget(QMainWindow):
 
         r, g, b, a = self.notes_color
         r, g, b, a = str(r), str(g), str(b), str(a)
-        print(type(self.text_note.toPlainText()))
         js_f['notes'].append(
             {'text': self.text_note.toPlainText(), 'r': r, 'g': g, 'b': b, 'a': a, 'data': date,
              'id': str(self.last_note_id + 1)})
@@ -1067,7 +1047,6 @@ class MyWidget(QMainWindow):
         self.choice_color_status = False
         self.choice_color.resize(0, 0)
 
-
         self.scroll_notes = QScrollArea(self.groupBox_5)
         self.notes_gb = QGroupBox(self.groupBox_5)
 
@@ -1078,6 +1057,7 @@ class MyWidget(QMainWindow):
         self.notes_gb.show()
         self.y = 10
 
+        # Создание и отображение элементов
         data = open(self.PATH_TO_NOTES_JSON).read()
         self.notes = json.loads(data)['notes']
         self.arr_notes = []
@@ -1125,7 +1105,6 @@ class MyWidget(QMainWindow):
         self.all_price = 0
         data = open(self.PATH_TO_ALL_BUYS_JSON).read()
         self.buys = json.loads(data)['all_buys']
-        print(self.buys)
         for i in range(len(self.buys)):
             self.arr_buys.append(
                 [QLabel(self.all_buys_gb), QLabel(self.all_buys_gb), QPushButton(self.all_buys_gb),
@@ -1150,7 +1129,6 @@ class MyWidget(QMainWindow):
         # Проверка правильности ввода
         time = self.inp_time_todo.text().split(':')
         textt = self.inp_todo.text()
-        print(time)
         if time == ['']:
             time = ['23', '59']
         if len(textt) == 0 or len(time) <= 1 or time[0].isalpha() or time[1].isalpha() or int(time[0]) > 23 or int(
@@ -1178,10 +1156,9 @@ class MyWidget(QMainWindow):
             self.tasks_gb.resize(1671, self.tasks_gb.size().height() + 80)
         self.show_elem_todo()
 
-        print(len(self.arr_to_dos))
 
-
-app = QApplication(sys.argv)
-ex = MyWidget()
-ex.show()
-sys.exit(app.exec_())
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    ex = MyWidget()
+    ex.show()
+    sys.exit(app.exec_())

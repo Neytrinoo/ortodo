@@ -1,19 +1,16 @@
-import sys
 from PyQt5 import uic, QtCore
-from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton, QLineEdit, QLabel, QGroupBox, QInputDialog, \
-    QVBoxLayout, QColorDialog, QScrollArea
-from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtWidgets import QMainWindow, QColorDialog
+from PyQt5.QtGui import QIcon
 from PIL import Image, ImageDraw
 import json
-import os
-import datetime
+from change_note_window import Ui_MainWindow
 
 
-class Change_note(QMainWindow):
+class Change_note(QMainWindow, Ui_MainWindow):
     def __init__(self, note_id, parent, color):
         super().__init__(parent, QtCore.Qt.Window)
-        uic.loadUi('change_note_design.ui', self)
-        self.PATH_TO_NOTES_JSON = 'notes.json'
+        self.setupUi(self)
+        self.PATH_TO_NOTES_JSON = 'databases/notes.json'
         self.note_id = note_id
         self.choice_color_status = False
         self.notes_color = color

@@ -1,0 +1,1 @@
+{"buy": [{"text": "Торт", "price": "200", "date": "16.12.2018", "status": "buy", "count": "1"}, {"text": "Печенья", "price": "150", "date": "16.12.2018", "status": "buy", "count": "3"}, {"text": "Конфеты", "price": "300", "date": "16.12.2018", "status": "not_buy", "count": "3"}]}
